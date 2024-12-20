@@ -7,6 +7,7 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
@@ -37,7 +38,7 @@ class PainVisualiser @JvmOverloads constructor(
     private var frontButton: Button
     private var backButton: Button
     private var categoryButton: Button
-    private var showAllButton: Button
+    private var showAllButton: CheckBox
     private var isFront = true
     private var showAllLayers = false
     private var selectedCategory: PainCategory? = null
@@ -84,7 +85,11 @@ class PainVisualiser @JvmOverloads constructor(
         categoryButton.setOnClickListener { showCategoryDropdown() }
 
         showAllButton.setOnClickListener {
-            showAllLayers = !showAllLayers
+            if(!showAllLayers)
+            {
+                saveCurrentDrawing()
+            }
+            showAllLayers = showAllButton.isChecked
             val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
             signaturePad.isEnabled = !showAllLayers
             loadDrawing()
@@ -174,7 +179,12 @@ class PainVisualiser @JvmOverloads constructor(
         }
 
         popupMenu.setOnMenuItemClickListener { menuItem ->
-            saveCurrentDrawing()
+            if(!showAllLayers)
+            {
+                saveCurrentDrawing()
+            }
+            showAllLayers = false
+            showAllButton.isChecked = showAllLayers
             val selectedIndex = menuItem.itemId
             selectedCategory = painCategories[selectedIndex]
             updateSelectedVisualLayer()

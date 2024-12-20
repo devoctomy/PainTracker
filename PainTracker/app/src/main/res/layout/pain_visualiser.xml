@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -24,13 +23,12 @@
             android:layout_height="match_parent"
             android:background="@android:color/transparent" />
 
-        <Button
+        <CheckBox
             android:id="@+id/showAllButton"
-            android:layout_width="50dp"
+            android:layout_width="200dp"
             android:layout_height="50dp"
             android:layout_gravity="top|start"
-            android:backgroundTint="@android:color/holo_red_dark"
-            android:text=""
+            android:text="@string/painVisualiserShowAllButton"
             android:padding="0dp"
             android:layout_margin="8dp" />
 
