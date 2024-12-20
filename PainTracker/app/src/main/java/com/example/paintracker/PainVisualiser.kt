@@ -21,7 +21,13 @@ class PainVisualiser @JvmOverloads constructor(
         set(value) {
             field = value
             if (value.isNotEmpty()) {
+                visualLayers.clear()
+                value.forEach { category ->
+                    visualLayers.add(VisualiserLayer(category, null, null))
+                }
+
                 selectedCategory = value[0]
+                updateSelectedVisualLayer()
                 updateCategoryButtonColor()
                 updateDrawingColor()
             }
@@ -31,16 +37,21 @@ class PainVisualiser @JvmOverloads constructor(
     private var frontButton: Button
     private var backButton: Button
     private var categoryButton: Button
-    private var isFrontImage = true
+    private var showAllButton: Button
+    private var isFront = true
+    private var showAllLayers = false
     private var selectedCategory: PainCategory? = null
+    private var selectedVisualiserLayer: VisualiserLayer? = null
 
     // Images for front and back
-    private val frontImageRes = R.drawable.body_front // Replace with your front image
-    private val backImageRes = R.drawable.body_back   // Replace with your back image
+    private val frontImageRes = R.drawable.body_front
+    private val backImageRes = R.drawable.body_back
 
     // Storage for drawing data
     private var frontDrawing: Bitmap? = null
     private var backDrawing: Bitmap? = null
+
+    private var visualLayers: MutableList<VisualiserLayer> = mutableListOf()
 
     init {
         // Inflate the layout
@@ -51,67 +62,94 @@ class PainVisualiser @JvmOverloads constructor(
         frontButton = findViewById(R.id.buttonFront)
         backButton = findViewById(R.id.buttonBack)
         categoryButton = findViewById(R.id.categoryButton)
+        showAllButton = findViewById(R.id.showAllButton)
 
         // Set initial image
         imageView.setImageResource(frontImageRes)
 
-        // Button click listeners
         frontButton.setOnClickListener {
-            saveCurrentDrawing() // Save current canvas
-            isFrontImage = true
+            saveCurrentDrawing()
+            isFront = true
             imageView.setImageResource(frontImageRes)
-            loadDrawing() // Load front canvas
+            loadDrawing()
         }
 
         backButton.setOnClickListener {
-            saveCurrentDrawing() // Save current canvas
-            isFrontImage = false
+            saveCurrentDrawing()
+            isFront = false
             imageView.setImageResource(backImageRes)
-            loadDrawing() // Load back canvas
+            loadDrawing()
         }
 
         categoryButton.setOnClickListener { showCategoryDropdown() }
+
+        showAllButton.setOnClickListener {
+            showAllLayers = !showAllLayers
+            val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
+            signaturePad.isEnabled = !showAllLayers
+            loadDrawing()
+        }
     }
 
-    // Placeholder functions (we'll implement these in the next steps)
-    private fun saveCurrentDrawing() {
-        // Ensure the SignaturePad is available
+    private fun mergeAll(): Bitmap {
         val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
 
-        // Create a transparent Bitmap with the same size as the SignaturePad
+        val width = signaturePad.width
+        val height = signaturePad.height
+
+        val resultBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(resultBitmap)
+
+        for (visualLayer in visualLayers) {
+            val drawing = if (isFront) visualLayer.frontDrawing else visualLayer.backDrawing
+            drawing?.let { canvas.drawBitmap(it, 0f, 0f, null) }
+        }
+
+        return resultBitmap
+    }
+
+    private fun updateSelectedVisualLayer() {
+        val curSelectedVisualiserLayer = visualLayers.find { it.painCategory == selectedCategory }
+        if(curSelectedVisualiserLayer != null)
+        {
+            frontDrawing = curSelectedVisualiserLayer.frontDrawing
+            backDrawing = curSelectedVisualiserLayer.backDrawing
+            selectedVisualiserLayer = curSelectedVisualiserLayer
+        }
+    }
+
+    private fun saveCurrentDrawing() {
+        val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
+
         val bitmap = Bitmap.createBitmap(
             signaturePad.width,
             signaturePad.height,
-            Bitmap.Config.ARGB_8888 // Supports transparency
+            Bitmap.Config.ARGB_8888
         )
         val canvas = Canvas(bitmap)
 
-        // Draw the SignaturePad's content onto the transparent Bitmap
         signaturePad.draw(canvas)
 
-        // Save the bitmap to the appropriate storage (front or back)
-        if (isFrontImage) {
+        if (isFront) {
             frontDrawing = bitmap
+            selectedVisualiserLayer?.frontDrawing = frontDrawing
         } else {
             backDrawing = bitmap
+            selectedVisualiserLayer?.backDrawing = backDrawing
         }
 
-        // Clear the SignaturePad for the next drawing
         signaturePad.clear()
     }
 
     private fun loadDrawing() {
-        // Ensure the SignaturePad is available
         val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
 
-        // Load the appropriate drawing based on the current side
-        val drawingToLoad = if (isFrontImage) frontDrawing else backDrawing
+        var drawingToLoad = if (isFront) frontDrawing else backDrawing
+        drawingToLoad = if (showAllLayers) mergeAll() else drawingToLoad
 
         if (drawingToLoad != null) {
-            // Load the saved bitmap into the SignaturePad
             signaturePad.signatureBitmap = drawingToLoad
         } else {
-            // Clear the pad if there's no saved drawing for the side
             signaturePad.clear()
         }
     }
@@ -136,10 +174,13 @@ class PainVisualiser @JvmOverloads constructor(
         }
 
         popupMenu.setOnMenuItemClickListener { menuItem ->
+            saveCurrentDrawing()
             val selectedIndex = menuItem.itemId
             selectedCategory = painCategories[selectedIndex]
+            updateSelectedVisualLayer()
             updateCategoryButtonColor()
             updateDrawingColor()
+            loadDrawing()
             true
         }
 

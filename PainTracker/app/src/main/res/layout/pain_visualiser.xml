@@ -25,6 +25,16 @@
             android:background="@android:color/transparent" />
 
         <Button
+            android:id="@+id/showAllButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="top|start"
+            android:backgroundTint="@android:color/holo_red_dark"
+            android:text=""
+            android:padding="0dp"
+            android:layout_margin="8dp" />
+
+        <Button
             android:id="@+id/categoryButton"
             android:layout_width="50dp"
             android:layout_height="50dp"
