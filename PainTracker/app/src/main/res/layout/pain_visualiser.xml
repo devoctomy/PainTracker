@@ -6,13 +6,24 @@
     android:orientation="vertical">
 
     <!-- ImageView for displaying the background image -->
-    <ImageView
-        android:id="@+id/imageView"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:contentDescription="TODO"
-        android:scaleType="center" />
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="TODO"
+            android:scaleType="centerInside" />
+
+        <com.github.gcacace.signaturepad.views.SignaturePad
+            android:id="@+id/signaturePad"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent" />
+    </FrameLayout>
 
     <!-- Buttons at the bottom -->
     <LinearLayout
