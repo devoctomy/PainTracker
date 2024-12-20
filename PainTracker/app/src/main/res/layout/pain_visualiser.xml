@@ -23,6 +23,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/transparent" />
+
+        <Button
+            android:id="@+id/categoryButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="top|end"
+            android:backgroundTint="@android:color/holo_red_dark"
+            android:text=""
+            android:padding="0dp"
+            android:layout_margin="8dp" />
     </FrameLayout>
 
     <!-- Buttons at the bottom -->

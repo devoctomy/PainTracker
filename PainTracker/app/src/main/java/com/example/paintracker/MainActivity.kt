@@ -19,6 +19,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        ConfigManager.initialize(this)
+        val config = ConfigManager.getConfig()
+        println(config.painCategories)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

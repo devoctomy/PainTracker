@@ -1,6 +1,7 @@
 package com.example.paintracker
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.util.AttributeSet
@@ -8,7 +9,7 @@ import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
-import com.example.paintracker.R
+import android.widget.PopupMenu
 
 class PainVisualiser @JvmOverloads constructor(
     context: Context,
@@ -16,10 +17,22 @@ class PainVisualiser @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+    var painCategories: List<PainCategory> = emptyList()
+        set(value) {
+            field = value
+            if (value.isNotEmpty()) {
+                selectedCategory = value[0]
+                updateCategoryButtonColor()
+                updateDrawingColor()
+            }
+        }
+
     private var imageView: ImageView
     private var frontButton: Button
     private var backButton: Button
+    private var categoryButton: Button
     private var isFrontImage = true
+    private var selectedCategory: PainCategory? = null
 
     // Images for front and back
     private val frontImageRes = R.drawable.body_front // Replace with your front image
@@ -37,6 +50,7 @@ class PainVisualiser @JvmOverloads constructor(
         imageView = findViewById(R.id.imageView)
         frontButton = findViewById(R.id.buttonFront)
         backButton = findViewById(R.id.buttonBack)
+        categoryButton = findViewById(R.id.categoryButton)
 
         // Set initial image
         imageView.setImageResource(frontImageRes)
@@ -55,6 +69,8 @@ class PainVisualiser @JvmOverloads constructor(
             imageView.setImageResource(backImageRes)
             loadDrawing() // Load back canvas
         }
+
+        categoryButton.setOnClickListener { showCategoryDropdown() }
     }
 
     // Placeholder functions (we'll implement these in the next steps)
@@ -98,5 +114,35 @@ class PainVisualiser @JvmOverloads constructor(
             // Clear the pad if there's no saved drawing for the side
             signaturePad.clear()
         }
+    }
+
+    private fun updateCategoryButtonColor() {
+        selectedCategory?.let {
+            categoryButton.backgroundTintList = ColorStateList.valueOf(it.colour)
+        }
+    }
+
+    private fun updateDrawingColor() {
+        selectedCategory?.let {
+            val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
+            signaturePad.setPenColor(it.colour)
+        }
+    }
+
+    private fun showCategoryDropdown() {
+        val popupMenu = PopupMenu(context, categoryButton)
+        painCategories.forEachIndexed { index, category ->
+            popupMenu.menu.add(0, index, index, category.displayName)
+        }
+
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            val selectedIndex = menuItem.itemId
+            selectedCategory = painCategories[selectedIndex]
+            updateCategoryButtonColor()
+            updateDrawingColor()
+            true
+        }
+
+        popupMenu.show()
     }
 }
