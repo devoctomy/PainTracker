@@ -1,0 +1,28 @@
+{
+  "painCategories": [
+    {
+      "id": "csharp",
+      "displayName": "Constant Sharp",
+      "description": "A constant sharp pain",
+      "colour": "red"
+    },
+    {
+      "id": "isharp",
+      "displayName": "Intermittent Sharp",
+      "description": "An intermittent sharp pain",
+      "colour": "yellow"
+    },    
+    {
+      "id": "cdache",
+      "displayName": "Constant Dull Ache",
+      "description": "A constant dull ache",
+      "colour": "blue"
+    },    
+    {
+      "id": "idache",
+      "displayName": "Intermittent Dull Ache",
+      "description": "An intermittent dull ache",
+      "colour": "green"
+    }
+  ]
+}
