@@ -175,16 +175,26 @@ class PainVisualiser @JvmOverloads constructor(
     private fun showCategoryDropdown() {
         val popupMenu = PopupMenu(context, categoryButton)
         painCategories.forEachIndexed { index, category ->
-            popupMenu.menu.add(0, index, index, category.displayName)
+            val menuItem = popupMenu.menu.add(0, index, index, category.displayName)
+            menuItem.isChecked = !showAllLayers && category == selectedCategory
+            menuItem.isCheckable = true
         }
 
         popupMenu.setOnMenuItemClickListener { menuItem ->
+            val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
+
+            for (i in 0 until popupMenu.menu.size()) {
+                popupMenu.menu.getItem(i).isChecked = false
+            }
+
             if(!showAllLayers)
             {
                 saveCurrentDrawing()
             }
             showAllLayers = false
             showAllButton.isChecked = showAllLayers
+            signaturePad.isEnabled = !showAllLayers
+            menuItem.isChecked = true
             val selectedIndex = menuItem.itemId
             selectedCategory = painCategories[selectedIndex]
             updateSelectedVisualLayer()
