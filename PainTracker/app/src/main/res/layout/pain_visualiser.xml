@@ -48,6 +48,7 @@
             android:id="@+id/buttonFront"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
+            android:maxWidth="320dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/painVisualiserFrontButton" />
@@ -56,6 +57,7 @@
             android:id="@+id/buttonBack"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
+            android:maxWidth="320dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/painVisualiserBackButton" />
