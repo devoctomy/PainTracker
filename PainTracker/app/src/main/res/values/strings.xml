@@ -8,4 +8,5 @@
     <string name="painVisualiserBackButton">Back</string>
     <string name="painVisualiserBodyImageDescription">Diagram of human body.</string>
     <string name="painVisualiserShowAllButton">Show All</string>
+    <string name="PainVisualiserSelectCategoryButton">Select category</string>
 </resources>

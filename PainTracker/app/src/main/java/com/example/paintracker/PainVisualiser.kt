@@ -12,6 +12,7 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -52,7 +53,7 @@ class PainVisualiser @JvmOverloads constructor(
     private var imageView: ImageView
     private var frontButton: Button
     private var backButton: Button
-    private var categoryButton: Button
+    private var categoryButton: FloatingActionButton
     private var showAllButton: CheckBox
     private var isFront = true
     private var showAllLayers = false
