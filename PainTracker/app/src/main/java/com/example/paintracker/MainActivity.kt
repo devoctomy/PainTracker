@@ -20,8 +20,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         ConfigManager.initialize(this)
-        val config = ConfigManager.getConfig()
-        println(config.painCategories)
+        PathManager.initalize(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

@@ -6,7 +6,6 @@ import kotlinx.serialization.json.Json
 object ConfigManager {
     private var config: Config? = null
 
-    // Initialize the ConfigManager
     fun initialize(context: Context) {
         if (config == null) {
             val json = context.assets.open("config.json").bufferedReader().use { it.readText() }
@@ -14,8 +13,7 @@ object ConfigManager {
         }
     }
 
-    // Get the Config instance
-    fun getConfig(): Config {
+    fun getCurrent(): Config {
         return config ?: throw IllegalStateException("ConfigManager is not initialized. Call initialize(context) first.")
     }
 }
