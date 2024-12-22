@@ -3,7 +3,6 @@ package com.example.paintracker
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -12,15 +11,12 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
+import com.example.paintracker.data.PainCategory
+import com.example.paintracker.data.VisualiserLayer
+import com.example.paintracker.interfaces.Side
+import com.example.paintracker.services.ServiceLocator
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import kotlin.io.path.exists
 
 class PainVisualiser @JvmOverloads constructor(
     context: Context,
@@ -28,7 +24,6 @@ class PainVisualiser @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    var dataRoot: String = ""
     var selectedDate: LocalDate = LocalDate.now()
 
     var painCategories: List<PainCategory> = emptyList()
@@ -45,8 +40,11 @@ class PainVisualiser @JvmOverloads constructor(
                 updateCategoryButtonColor()
                 updateDrawingColor()
 
-                loadSelectedDate()
-                loadDrawing()
+                ServiceLocator.visualiserLayerIoService.loadAll(selectedDate, visualLayers)
+                frontDrawing = selectedVisualiserLayer?.frontDrawing
+                backDrawing = selectedVisualiserLayer?.backDrawing
+
+                switchDrawing()
             }
         }
 
@@ -88,14 +86,14 @@ class PainVisualiser @JvmOverloads constructor(
             saveCurrentDrawing()
             isFront = true
             imageView.setImageResource(frontImageRes)
-            loadDrawing()
+            switchDrawing()
         }
 
         backButton.setOnClickListener {
             saveCurrentDrawing()
             isFront = false
             imageView.setImageResource(backImageRes)
-            loadDrawing()
+            switchDrawing()
         }
 
         categoryButton.setOnClickListener { showCategoryDropdown() }
@@ -108,8 +106,10 @@ class PainVisualiser @JvmOverloads constructor(
             showAllLayers = showAllButton.isChecked
             val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
             signaturePad.isEnabled = !showAllLayers
-            loadDrawing()
+            switchDrawing()
         }
+
+        painCategories = ServiceLocator.configService.getCurrent().painCategories
     }
 
     private fun mergeAll(): Bitmap {
@@ -127,52 +127,6 @@ class PainVisualiser @JvmOverloads constructor(
         }
 
         return resultBitmap
-    }
-
-    private fun loadSelectedDate() {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val datePart = selectedDate.format(formatter)
-        val datePath = Paths.get(dataRoot).resolve(datePart)
-        for (visualLayer in visualLayers) {
-            val layerPath = datePath.resolve(visualLayer.painCategory?.id)
-            val frontPath = layerPath.resolve("front.png")
-            val backPath = layerPath.resolve("back.png")
-
-            if(frontPath.exists()) {
-                visualLayer.frontDrawing = BitmapFactory.decodeFile(frontPath.toString())
-                println("Image loaded from '${frontPath.toString()}'")
-            }
-
-            if(backPath.exists()) {
-                visualLayer.backDrawing = BitmapFactory.decodeFile(backPath.toString())
-                println("Image loaded from '${frontPath.toString()}'")
-            }
-
-            if(visualLayer == selectedVisualiserLayer) {
-                frontDrawing = visualLayer.frontDrawing
-                backDrawing = visualLayer.backDrawing
-            }
-        }
-    }
-
-    private fun saveSelectedDate() {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val datePart = selectedDate.format(formatter)
-        val datePath = Paths.get(dataRoot).resolve(datePart)
-        val layerPath = datePath.resolve(selectedVisualiserLayer?.painCategory?.id)
-        val frontPath = layerPath.resolve("front.png")
-        val backPath = layerPath.resolve("back.png")
-
-        if(isFront) {
-            println("Creating directory '${frontPath.parent.toString()}'")
-            Files.createDirectories(frontPath.parent)
-            saveBitmapToFile(selectedVisualiserLayer?.frontDrawing!!, frontPath.toString())
-        }
-        else {
-            println("Creating directory '${backPath.parent.toString()}'")
-            Files.createDirectories(backPath.parent)
-            saveBitmapToFile(selectedVisualiserLayer?.backDrawing!!, backPath.toString())
-        }
     }
 
     private fun updateSelectedVisualLayer() {
@@ -205,32 +159,19 @@ class PainVisualiser @JvmOverloads constructor(
             selectedVisualiserLayer?.backDrawing = backDrawing
         }
 
-        saveSelectedDate()
+        ServiceLocator.visualiserLayerIoService.saveLayer(selectedDate, selectedVisualiserLayer!!, if(isFront) Side.FRONT else Side.BACK)
+
         signaturePad.clear()
     }
 
-    private fun saveBitmapToFile(bitmap: Bitmap, path: String) {
-        val file = File(path)
-        try {
-            FileOutputStream(file).use { outputStream ->
-                // Compress the Bitmap as a PNG (or use Bitmap.CompressFormat.JPEG for JPEG format)
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            }
-            println("Image saved to '{$path}'")
-        } catch (e: IOException) {
-            e.printStackTrace()
-            throw IOException("Unable to save image to $path")
-        }
-    }
-
-    private fun loadDrawing() {
+    private fun switchDrawing() {
         val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
 
-        var drawingToLoad = if (isFront) frontDrawing else backDrawing
-        drawingToLoad = if (showAllLayers) mergeAll() else drawingToLoad
+        var drawingToShow = if (isFront) frontDrawing else backDrawing
+        drawingToShow = if (showAllLayers) mergeAll() else drawingToShow
 
-        if (drawingToLoad != null) {
-            signaturePad.signatureBitmap = drawingToLoad
+        if (drawingToShow != null) {
+            signaturePad.signatureBitmap = drawingToShow
         } else {
             signaturePad.clear()
         }
@@ -277,7 +218,7 @@ class PainVisualiser @JvmOverloads constructor(
             updateSelectedVisualLayer()
             updateCategoryButtonColor()
             updateDrawingColor()
-            loadDrawing()
+            switchDrawing()
             true
         }
 

@@ -29,10 +29,6 @@ class RecordPainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val painVisualiser = binding.painVisualiser
-        painVisualiser.dataRoot = PathManager.appDataDir
-        painVisualiser.painCategories = ConfigManager.getCurrent().painCategories
     }
 
     override fun onDestroyView() {

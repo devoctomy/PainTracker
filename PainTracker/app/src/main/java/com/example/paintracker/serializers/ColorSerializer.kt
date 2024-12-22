@@ -1,4 +1,4 @@
-package com.example.paintracker
+package com.example.paintracker.serializers
 
 import android.graphics.Color
 import kotlinx.serialization.KSerializer
