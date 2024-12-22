@@ -3,6 +3,7 @@ package com.example.paintracker.services
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.example.paintracker.data.VisualiserLayer
+import com.example.paintracker.interfaces.IPathService
 import com.example.paintracker.interfaces.IVisualiserLayerIoService
 import com.example.paintracker.interfaces.Path
 import com.example.paintracker.interfaces.Side
@@ -13,11 +14,14 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
 import kotlin.io.path.exists
 
-class VisualiserLayerIoService : IVisualiserLayerIoService {
+class VisualiserLayerIoService @Inject constructor(
+    private val pathService: IPathService
+) : IVisualiserLayerIoService {
 
-    var dataRoot: String = ServiceLocator.pathService.getPath(Path.APPDATAROOT)
+    private val dataRoot: String by lazy { pathService.getPath(Path.APPDATAROOT) }
 
     override fun loadAll(localDate: LocalDate, layers: MutableList<VisualiserLayer>) {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")

@@ -13,9 +13,11 @@ import android.widget.LinearLayout
 import android.widget.PopupMenu
 import com.example.paintracker.data.PainCategory
 import com.example.paintracker.data.VisualiserLayer
+import com.example.paintracker.interfaces.IConfigService
+import com.example.paintracker.interfaces.IVisualiserLayerIoService
 import com.example.paintracker.interfaces.Side
-import com.example.paintracker.services.ServiceLocator
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import dagger.hilt.android.EntryPointAccessors
 import java.time.LocalDate
 
 class PainVisualiser @JvmOverloads constructor(
@@ -24,9 +26,11 @@ class PainVisualiser @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    var selectedDate: LocalDate = LocalDate.now()
+    private val configService: IConfigService
+    private val visualiserLayerIoService: IVisualiserLayerIoService
 
-    var painCategories: List<PainCategory> = emptyList()
+    private var selectedDate: LocalDate = LocalDate.now()
+    private var painCategories: List<PainCategory> = emptyList()
         set(value) {
             field = value
             if (value.isNotEmpty()) {
@@ -40,7 +44,7 @@ class PainVisualiser @JvmOverloads constructor(
                 updateCategoryButtonColor()
                 updateDrawingColor()
 
-                ServiceLocator.visualiserLayerIoService.loadAll(selectedDate, visualLayers)
+                visualiserLayerIoService.loadAll(selectedDate, visualLayers)
                 frontDrawing = selectedVisualiserLayer?.frontDrawing
                 backDrawing = selectedVisualiserLayer?.backDrawing
 
@@ -69,6 +73,13 @@ class PainVisualiser @JvmOverloads constructor(
     private var visualLayers: MutableList<VisualiserLayer> = mutableListOf()
 
     init {
+        val entryPoint = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            HiltServiceBridge::class.java
+        )
+        configService = entryPoint.getConfigService()
+        visualiserLayerIoService = entryPoint.getVisualiserLayerIoService()
+
         // Inflate the layout
         LayoutInflater.from(context).inflate(R.layout.pain_visualiser, this, true)
 
@@ -109,7 +120,7 @@ class PainVisualiser @JvmOverloads constructor(
             switchDrawing()
         }
 
-        painCategories = ServiceLocator.configService.getCurrent().painCategories
+        painCategories = configService.getCurrent().painCategories
     }
 
     private fun mergeAll(): Bitmap {
@@ -159,7 +170,7 @@ class PainVisualiser @JvmOverloads constructor(
             selectedVisualiserLayer?.backDrawing = backDrawing
         }
 
-        ServiceLocator.visualiserLayerIoService.saveLayer(selectedDate, selectedVisualiserLayer!!, if(isFront) Side.FRONT else Side.BACK)
+        visualiserLayerIoService.saveLayer(selectedDate, selectedVisualiserLayer!!, if(isFront) Side.FRONT else Side.BACK)
 
         signaturePad.clear()
     }

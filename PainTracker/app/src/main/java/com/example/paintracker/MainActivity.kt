@@ -9,7 +9,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import com.example.paintracker.databinding.ActivityMainBinding
-import com.example.paintracker.services.ServiceLocator
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,8 +17,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        ServiceLocator.initialize(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
