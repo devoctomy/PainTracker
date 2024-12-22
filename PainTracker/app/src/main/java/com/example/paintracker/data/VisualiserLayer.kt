@@ -1,4 +1,4 @@
-package com.example.paintracker
+package com.example.paintracker.data
 
 import android.graphics.Bitmap
 

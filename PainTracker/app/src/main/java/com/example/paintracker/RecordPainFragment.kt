@@ -12,6 +12,8 @@ import com.example.paintracker.databinding.FragmentRecordPainBinding
  */
 class RecordPainFragment : Fragment() {
 
+    var painVisualiser: PainVisualiser? = null
+
     private var _binding: FragmentRecordPainBinding? = null
 
     // This property is only valid between onCreateView and
@@ -24,19 +26,18 @@ class RecordPainFragment : Fragment() {
     ): View {
 
         _binding = FragmentRecordPainBinding.inflate(inflater, container, false)
+
+        painVisualiser = _binding!!.painVisualiser
+
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    /*override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val painVisualiser = binding.painVisualiser
-        painVisualiser.dataRoot = PathManager.appDataDir
-        painVisualiser.painCategories = ConfigManager.getCurrent().painCategories
-    }
+    }*/
 
     override fun onDestroyView() {
         super.onDestroyView()
-        //_binding = null
+        _binding = null
     }
 }

@@ -1,5 +1,6 @@
-package com.example.paintracker
+package com.example.paintracker.data
 
+import com.example.paintracker.serializers.ColorSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable
