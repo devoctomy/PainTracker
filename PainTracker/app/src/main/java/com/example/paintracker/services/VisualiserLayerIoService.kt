@@ -16,11 +16,13 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlin.io.path.exists
+import mu.KotlinLogging
 
 class VisualiserLayerIoService @Inject constructor(
     private val pathService: IPathService
 ) : IVisualiserLayerIoService {
 
+    private val logger = KotlinLogging.logger {}
     private val dataRoot: String by lazy { pathService.getPath(Path.APPDATAROOT) }
 
     override fun loadAll(localDate: LocalDate, layers: MutableList<VisualiserLayer>) {
@@ -38,12 +40,12 @@ class VisualiserLayerIoService @Inject constructor(
             visualLayer.backDrawing = null
 
             if(frontPath.exists()) {
-                println("Loading front image '${frontPath.parent.toString()}'")
+                logger.info("Loading front image '${frontPath.parent}'")
                 visualLayer.frontDrawing = BitmapFactory.decodeFile(frontPath.toString())
             }
 
             if(backPath.exists()) {
-                println("Loading back image '${frontPath.parent.toString()}'")
+                logger.info("Loading back image '${backPath.parent}'")
                 visualLayer.backDrawing = BitmapFactory.decodeFile(backPath.toString())
             }
         }
@@ -56,15 +58,14 @@ class VisualiserLayerIoService @Inject constructor(
         val layerPath = datePath.resolve(layer.painCategory?.id)
         val frontPath = layerPath.resolve("front.png")
         val backPath = layerPath.resolve("back.png")
+        val path = if (side == Side.FRONT) frontPath else backPath
+        logger.info("Creating directory '${path.parent}'")
+        Files.createDirectories(path.parent)
 
         if(side == Side.FRONT) {
-            println("Creating directory '${frontPath.parent.toString()}'")
-            Files.createDirectories(frontPath.parent)
             saveBitmapToFile(layer.frontDrawing!!, frontPath.toString())
         }
         else {
-            println("Creating directory '${backPath.parent.toString()}'")
-            Files.createDirectories(backPath.parent)
             saveBitmapToFile(layer.backDrawing!!, backPath.toString())
         }
     }
@@ -73,11 +74,11 @@ class VisualiserLayerIoService @Inject constructor(
         val file = File(path)
         try {
             FileOutputStream(file).use { outputStream ->
-                // Compress the Bitmap as a PNG (or use Bitmap.CompressFormat.JPEG for JPEG format)
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             }
-            println("Image saved to '{$path}'")
+            logger.info("Image saved to '{$path}'")
         } catch (e: IOException) {
+            logger.error("Unable to save image to '${path}'.")
             e.printStackTrace()
             throw IOException("Unable to save image to $path")
         }

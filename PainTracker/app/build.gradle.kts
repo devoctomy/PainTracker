@@ -42,7 +42,8 @@ android {
 }
 
 dependencies {
-    implementation(libs.hilt.android) // Hilt runtime
+    implementation(libs.kotlin.logging)
+    implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.signature.pad)
