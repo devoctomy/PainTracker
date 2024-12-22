@@ -12,6 +12,8 @@ import com.example.paintracker.databinding.FragmentRecordPainBinding
  */
 class RecordPainFragment : Fragment() {
 
+    var painVisualiser: PainVisualiser? = null
+
     private var _binding: FragmentRecordPainBinding? = null
 
     // This property is only valid between onCreateView and
@@ -24,6 +26,9 @@ class RecordPainFragment : Fragment() {
     ): View {
 
         _binding = FragmentRecordPainBinding.inflate(inflater, container, false)
+
+        painVisualiser = _binding!!.painVisualiser
+
         return binding.root
     }
 

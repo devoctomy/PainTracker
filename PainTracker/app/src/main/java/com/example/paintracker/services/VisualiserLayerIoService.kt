@@ -32,6 +32,11 @@ class VisualiserLayerIoService @Inject constructor(
             val frontPath = layerPath.resolve("front.png")
             val backPath = layerPath.resolve("back.png")
 
+            visualLayer.frontDrawing?.recycle()
+            visualLayer.frontDrawing = null
+            visualLayer.backDrawing?.recycle()
+            visualLayer.backDrawing = null
+
             if(frontPath.exists()) {
                 println("Loading front image '${frontPath.parent.toString()}'")
                 visualLayer.frontDrawing = BitmapFactory.decodeFile(frontPath.toString())

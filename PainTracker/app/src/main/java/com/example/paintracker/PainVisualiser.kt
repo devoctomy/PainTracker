@@ -29,7 +29,16 @@ class PainVisualiser @JvmOverloads constructor(
     private val configService: IConfigService
     private val visualiserLayerIoService: IVisualiserLayerIoService
 
-    private var selectedDate: LocalDate = LocalDate.now()
+    var selectedDate: LocalDate = LocalDate.now()
+        set(value) {
+            field = value
+
+            visualiserLayerIoService.loadAll(value, visualLayers)
+            frontDrawing = selectedVisualiserLayer?.frontDrawing
+            backDrawing = selectedVisualiserLayer?.backDrawing
+
+            switchDrawing()
+        }
     private var painCategories: List<PainCategory> = emptyList()
         set(value) {
             field = value
