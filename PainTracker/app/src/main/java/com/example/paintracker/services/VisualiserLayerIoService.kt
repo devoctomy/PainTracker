@@ -3,6 +3,7 @@ package com.example.paintracker.services
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.example.paintracker.data.VisualiserLayer
+import com.example.paintracker.interfaces.IBitmapLoaderService
 import com.example.paintracker.interfaces.IPathService
 import com.example.paintracker.interfaces.IVisualiserLayerIoService
 import com.example.paintracker.interfaces.Path
@@ -16,18 +17,20 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlin.io.path.exists
-import mu.KotlinLogging
+import android.util.Log
 
 class VisualiserLayerIoService @Inject constructor(
-    private val pathService: IPathService
+    private val pathService: IPathService,
+    private val bitmapLoaderService: IBitmapLoaderService
 ) : IVisualiserLayerIoService {
 
-    private val logger = KotlinLogging.logger {}
     private val dataRoot: String by lazy { pathService.getPath(Path.APPDATAROOT) }
 
-    override fun loadAll(localDate: LocalDate, layers: MutableList<VisualiserLayer>) {
+    override fun loadAll(localDate: LocalDate, layers: MutableList<VisualiserLayer>, width: Int, height: Int) {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val datePart = localDate.format(formatter)
+        Log.i("VisualiserLayerIoService", "Loading all images for '${datePart}', width = ${width}, height = ${height}.")
+
         val datePath = Paths.get(dataRoot).resolve(datePart)
         for (visualLayer in layers) {
             val layerPath = datePath.resolve(visualLayer.painCategory?.id)
@@ -40,12 +43,12 @@ class VisualiserLayerIoService @Inject constructor(
             visualLayer.backDrawing = null
 
             if(frontPath.exists()) {
-                logger.info("Loading front image '${frontPath.parent}'")
+                Log.i("VisualiserLayerIoService","Loading front image '${frontPath.parent}'")
                 visualLayer.frontDrawing = BitmapFactory.decodeFile(frontPath.toString())
             }
 
             if(backPath.exists()) {
-                logger.info("Loading back image '${backPath.parent}'")
+                Log.i("VisualiserLayerIoService","Loading back image '${backPath.parent}'")
                 visualLayer.backDrawing = BitmapFactory.decodeFile(backPath.toString())
             }
         }
@@ -59,7 +62,7 @@ class VisualiserLayerIoService @Inject constructor(
         val frontPath = layerPath.resolve("front.png")
         val backPath = layerPath.resolve("back.png")
         val path = if (side == Side.FRONT) frontPath else backPath
-        logger.info("Creating directory '${path.parent}'")
+        Log.i("VisualiserLayerIoService","Creating directory '${path.parent}'")
         Files.createDirectories(path.parent)
 
         if(side == Side.FRONT) {
@@ -70,15 +73,36 @@ class VisualiserLayerIoService @Inject constructor(
         }
     }
 
+    override fun deleteLayer(localDate: LocalDate, layer: VisualiserLayer, side: Side) {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val datePart = localDate.format(formatter)
+        val datePath = Paths.get(dataRoot).resolve(datePart)
+        val layerPath = datePath.resolve(layer.painCategory?.id)
+        val frontPath = layerPath.resolve("front.png")
+        val backPath = layerPath.resolve("back.png")
+        val path = if (side == Side.FRONT) frontPath else backPath
+        Log.i("VisualiserLayerIoService","Creating directory '${path.parent}'")
+        Files.createDirectories(path.parent)
+
+        if(side == Side.FRONT) {
+            Files.deleteIfExists(frontPath)
+            layer.frontDrawing = null
+        }
+        else {
+            Files.deleteIfExists(backPath)
+            layer.backDrawing = null
+        }
+    }
+
     private fun saveBitmapToFile(bitmap: Bitmap, path: String) {
         val file = File(path)
         try {
             FileOutputStream(file).use { outputStream ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             }
-            logger.info("Image saved to '{$path}'")
+            Log.i("VisualiserLayerIoService","Image saved to '{$path}'")
         } catch (e: IOException) {
-            logger.error("Unable to save image to '${path}'.")
+            Log.e("VisualiserLayerIoService","Unable to save image to '${path}'.")
             e.printStackTrace()
             throw IOException("Unable to save image to $path")
         }

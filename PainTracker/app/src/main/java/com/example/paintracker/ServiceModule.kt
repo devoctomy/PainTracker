@@ -1,9 +1,11 @@
 package com.example.paintracker
 
 import android.content.Context
+import com.example.paintracker.interfaces.IBitmapLoaderService
 import com.example.paintracker.interfaces.IConfigService
 import com.example.paintracker.interfaces.IPathService
 import com.example.paintracker.interfaces.IVisualiserLayerIoService
+import com.example.paintracker.services.BitmapLoaderService
 import com.example.paintracker.services.ConfigService
 import com.example.paintracker.services.PathService
 import com.example.paintracker.services.VisualiserLayerIoService
@@ -36,7 +38,13 @@ object ServiceModule {
 
     @Provides
     @Singleton
-    fun provideVisualiserLayerIoService(pathService: IPathService): IVisualiserLayerIoService {
-        return VisualiserLayerIoService(pathService)
+    fun provideVisualiserLayerIoService(pathService: IPathService, bitmapLoaderService: IBitmapLoaderService): IVisualiserLayerIoService {
+        return VisualiserLayerIoService(pathService, bitmapLoaderService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBitmapLoaderService(): IBitmapLoaderService {
+        return BitmapLoaderService()
     }
 }

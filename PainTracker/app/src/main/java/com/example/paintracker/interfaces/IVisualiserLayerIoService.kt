@@ -8,6 +8,7 @@ enum class Side {
 }
 
 interface IVisualiserLayerIoService {
-    fun loadAll(localDate: LocalDate, layers: MutableList<VisualiserLayer>)
+    fun loadAll(localDate: LocalDate, layers: MutableList<VisualiserLayer>, width: Int, height: Int)
     fun saveLayer(localDate: LocalDate, layer: VisualiserLayer, side: Side)
+    fun deleteLayer(localDate: LocalDate, layer: VisualiserLayer, side: Side)
 }
