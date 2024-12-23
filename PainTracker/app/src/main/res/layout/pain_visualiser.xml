@@ -62,7 +62,7 @@
             android:layout_marginEnd="@dimen/fab_margin"
             android:layout_marginBottom="@dimen/fab_margin"
             android:contentDescription="@string/PainVisualiserClearButton"
-            android:visibility="visible"
+            android:visibility="invisible"
             app:srcCompat="@android:drawable/ic_menu_delete" />
 
     </FrameLayout>

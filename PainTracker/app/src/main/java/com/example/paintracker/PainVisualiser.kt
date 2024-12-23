@@ -254,6 +254,7 @@ class PainVisualiser @JvmOverloads constructor(
         }
 
         visualiserLayerIoService.saveLayer(selectedDate, selectedVisualiserLayer!!, if(isFront) Side.FRONT else Side.BACK)
+        deleteButton.visibility = VISIBLE
     }
 
     private fun switchDrawing() {
@@ -263,8 +264,10 @@ class PainVisualiser @JvmOverloads constructor(
 
         if (drawingToShow != null) {
             signaturePad.signatureBitmap = drawingToShow
+            deleteButton.visibility = if(showAllLayers) INVISIBLE else VISIBLE
         } else {
             signaturePad.clear()
+            deleteButton.visibility = INVISIBLE
         }
     }
 

@@ -11,4 +11,5 @@
     <string name="PainVisualiserSelectCategoryButton">Select category</string>
     <string name="MainMenuSelectDate">Select Date</string>
     <string name="PainVisualiserSaveButton">Save</string>
+    <string name="PainVisualiserClearButton">Clear</string>
 </resources>
