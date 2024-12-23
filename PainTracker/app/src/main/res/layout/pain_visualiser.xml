@@ -31,7 +31,7 @@
             android:layout_gravity="top|start"
             android:text="@string/painVisualiserShowAllButton"
             android:padding="0dp"
-            android:layout_margin="8dp" />
+            android:layout_marginStart="@dimen/fab_margin" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/categoryButton"
@@ -39,9 +39,20 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
             android:layout_marginEnd="@dimen/fab_margin"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="@dimen/fab_margin"
             android:contentDescription="@string/PainVisualiserSelectCategoryButton"
             app:srcCompat="@android:drawable/ic_menu_info_details" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="@dimen/fab_margin"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:contentDescription="@string/PainVisualiserSaveButton"
+            android:visibility="invisible"
+            app:srcCompat="@android:drawable/ic_menu_save" />
 
     </FrameLayout>
 

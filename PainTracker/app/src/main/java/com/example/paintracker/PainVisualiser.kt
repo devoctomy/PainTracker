@@ -1,5 +1,6 @@
 package com.example.paintracker
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
@@ -16,8 +17,10 @@ import com.example.paintracker.data.VisualiserLayer
 import com.example.paintracker.interfaces.IConfigService
 import com.example.paintracker.interfaces.IVisualiserLayerIoService
 import com.example.paintracker.interfaces.Side
+import com.github.gcacace.signaturepad.views.SignaturePad
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.EntryPointAccessors
+import mu.KotlinLogging
 import java.time.LocalDate
 
 class PainVisualiser @JvmOverloads constructor(
@@ -26,6 +29,7 @@ class PainVisualiser @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
+    private val logger = KotlinLogging.logger {}
     private val configService: IConfigService
     private val visualiserLayerIoService: IVisualiserLayerIoService
 
@@ -36,6 +40,8 @@ class PainVisualiser @JvmOverloads constructor(
             visualiserLayerIoService.loadAll(value, visualLayers)
             frontDrawing = selectedVisualiserLayer?.frontDrawing
             backDrawing = selectedVisualiserLayer?.backDrawing
+            isDirty = false
+            reflectIsDirty()
 
             switchDrawing()
         }
@@ -43,6 +49,7 @@ class PainVisualiser @JvmOverloads constructor(
         set(value) {
             field = value
             if (value.isNotEmpty()) {
+                logger.info ("Pain categories have changed, updating visual layers.")
                 visualLayers.clear()
                 value.forEach { category ->
                     visualLayers.add(VisualiserLayer(category, null, null))
@@ -56,18 +63,23 @@ class PainVisualiser @JvmOverloads constructor(
                 visualiserLayerIoService.loadAll(selectedDate, visualLayers)
                 frontDrawing = selectedVisualiserLayer?.frontDrawing
                 backDrawing = selectedVisualiserLayer?.backDrawing
+                isDirty = false
+                reflectIsDirty()
 
                 switchDrawing()
             }
         }
 
+    private var signaturePad: SignaturePad
     private var imageView: ImageView
     private var frontButton: Button
     private var backButton: Button
     private var categoryButton: FloatingActionButton
+    private var saveButton: FloatingActionButton
     private var showAllButton: CheckBox
     private var isFront = true
     private var showAllLayers = false
+    private var isDirty = false
     private var selectedCategory: PainCategory? = null
     private var selectedVisualiserLayer: VisualiserLayer? = null
 
@@ -82,6 +94,8 @@ class PainVisualiser @JvmOverloads constructor(
     private var visualLayers: MutableList<VisualiserLayer> = mutableListOf()
 
     init {
+        logger.info ("Initializing PainVisualizer...")
+
         val entryPoint = EntryPointAccessors.fromApplication(
             context.applicationContext,
             HiltServiceBridge::class.java
@@ -93,48 +107,77 @@ class PainVisualiser @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.pain_visualiser, this, true)
 
         // Find views
+        signaturePad = findViewById(R.id.signaturePad)
         imageView = findViewById(R.id.imageView)
         frontButton = findViewById(R.id.buttonFront)
         backButton = findViewById(R.id.buttonBack)
         categoryButton = findViewById(R.id.categoryButton)
         showAllButton = findViewById(R.id.showAllButton)
+        saveButton = findViewById(R.id.saveButton)
 
         // Set initial image
         imageView.setImageResource(frontImageRes)
 
         frontButton.setOnClickListener {
-            saveCurrentDrawing()
-            isFront = true
-            imageView.setImageResource(frontImageRes)
-            switchDrawing()
+            checkAndSaveIfDirty {
+                isFront = true
+                imageView.setImageResource(frontImageRes)
+                switchDrawing()
+            }
         }
 
         backButton.setOnClickListener {
-            saveCurrentDrawing()
-            isFront = false
-            imageView.setImageResource(backImageRes)
-            switchDrawing()
+            checkAndSaveIfDirty {
+                isFront = false
+                imageView.setImageResource(backImageRes)
+                switchDrawing()
+            }
         }
 
         categoryButton.setOnClickListener { showCategoryDropdown() }
 
         showAllButton.setOnClickListener {
-            if(!showAllLayers)
-            {
-                saveCurrentDrawing()
+            checkAndSaveIfDirty {
+                showAllLayers = showAllButton.isChecked
+                val signaturePad = findViewById<SignaturePad>(R.id.signaturePad)
+                signaturePad.isEnabled = !showAllLayers
+                switchDrawing()
             }
-            showAllLayers = showAllButton.isChecked
-            val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
-            signaturePad.isEnabled = !showAllLayers
-            switchDrawing()
         }
 
+        saveButton.setOnClickListener {
+            saveCurrentDrawing()
+            isDirty = false
+            reflectIsDirty()
+        }
+
+        signaturePad.setOnSignedListener(object : SignaturePad.OnSignedListener {
+            override fun onSigned() {
+                //isDirty = true
+                //reflectIsDirty()
+            }
+
+            override fun onClear() {
+                isDirty = false
+                reflectIsDirty()
+            }
+
+            override fun onStartSigning() {
+                isDirty = true
+                reflectIsDirty()
+            }
+        })
+
         painCategories = configService.getCurrent().painCategories
+        logger.info ("PainVisualizer initialized.")
     }
 
-    private fun mergeAll(): Bitmap {
-        val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
+    private fun reflectIsDirty() {
+        saveButton.visibility = if (isDirty) VISIBLE else INVISIBLE
+    }
 
+    private fun mergeAllLayers(): Bitmap {
+        logger.info ("Merging all layers.")
         val width = signaturePad.width
         val height = signaturePad.height
 
@@ -149,7 +192,30 @@ class PainVisualiser @JvmOverloads constructor(
         return resultBitmap
     }
 
+    private fun checkAndSaveIfDirty(onCompleted: () -> Unit) {
+        if (isDirty) {
+            logger.info ("Changes have not been saved, prompting to save.")
+            AlertDialog.Builder(context)
+                .setTitle("Unsaved changes")
+                .setMessage("Do you want to save your changes?")
+                .setPositiveButton("Yes") { _, _ ->
+                    saveCurrentDrawing()
+                    onCompleted() // Proceed after saving
+                }
+                .setNegativeButton("No") { _, _ ->
+                    onCompleted() // Proceed without saving
+                }
+                .setOnCancelListener {
+                    onCompleted() // Treat cancel as proceeding without saving
+                }
+                .show()
+        } else {
+            onCompleted() // If not dirty, proceed immediately
+        }
+    }
+
     private fun updateSelectedVisualLayer() {
+        logger.info ("Updating selected visual layer.")
         val curSelectedVisualiserLayer = visualLayers.find { it.painCategory == selectedCategory }
         if(curSelectedVisualiserLayer != null)
         {
@@ -160,8 +226,7 @@ class PainVisualiser @JvmOverloads constructor(
     }
 
     private fun saveCurrentDrawing() {
-        val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
-
+        logger.info ("Saving current visual layer.")
         val bitmap = Bitmap.createBitmap(
             signaturePad.width,
             signaturePad.height,
@@ -180,15 +245,12 @@ class PainVisualiser @JvmOverloads constructor(
         }
 
         visualiserLayerIoService.saveLayer(selectedDate, selectedVisualiserLayer!!, if(isFront) Side.FRONT else Side.BACK)
-
-        signaturePad.clear()
     }
 
     private fun switchDrawing() {
-        val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
-
+        logger.info ("Switching to ${if (isFront) "front" else "back"}.")
         var drawingToShow = if (isFront) frontDrawing else backDrawing
-        drawingToShow = if (showAllLayers) mergeAll() else drawingToShow
+        drawingToShow = if (showAllLayers) mergeAllLayers() else drawingToShow
 
         if (drawingToShow != null) {
             signaturePad.signatureBitmap = drawingToShow
@@ -198,19 +260,21 @@ class PainVisualiser @JvmOverloads constructor(
     }
 
     private fun updateCategoryButtonColor() {
+        logger.info ("Updating category button colour.")
         selectedCategory?.let {
             categoryButton.backgroundTintList = ColorStateList.valueOf(it.colour)
         }
     }
 
     private fun updateDrawingColor() {
+        logger.info ("Updating drawing colour.")
         selectedCategory?.let {
-            val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
             signaturePad.setPenColor(it.colour)
         }
     }
 
     private fun showCategoryDropdown() {
+        logger.info ("Showing pain category dropdown.")
         val popupMenu = PopupMenu(context, categoryButton)
         painCategories.forEachIndexed { index, category ->
             val menuItem = popupMenu.menu.add(0, index, index, category.displayName)
@@ -219,26 +283,25 @@ class PainVisualiser @JvmOverloads constructor(
         }
 
         popupMenu.setOnMenuItemClickListener { menuItem ->
-            val signaturePad = findViewById<com.github.gcacace.signaturepad.views.SignaturePad>(R.id.signaturePad)
+            logger.info ("Selected pain category.")
 
             for (i in 0 until popupMenu.menu.size()) {
                 popupMenu.menu.getItem(i).isChecked = false
             }
 
-            if(!showAllLayers)
-            {
-                saveCurrentDrawing()
+            checkAndSaveIfDirty {
+                showAllLayers = false
+                showAllButton.isChecked = showAllLayers
+                signaturePad.isEnabled = !showAllLayers
+                menuItem.isChecked = true
+                val selectedIndex = menuItem.itemId
+                selectedCategory = painCategories[selectedIndex]
+                updateSelectedVisualLayer()
+                updateCategoryButtonColor()
+                updateDrawingColor()
+                switchDrawing()
             }
-            showAllLayers = false
-            showAllButton.isChecked = showAllLayers
-            signaturePad.isEnabled = !showAllLayers
-            menuItem.isChecked = true
-            val selectedIndex = menuItem.itemId
-            selectedCategory = painCategories[selectedIndex]
-            updateSelectedVisualLayer()
-            updateCategoryButtonColor()
-            updateDrawingColor()
-            switchDrawing()
+
             true
         }
 
