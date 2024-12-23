@@ -3,6 +3,7 @@ package com.example.paintracker.services
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.example.paintracker.data.VisualiserLayer
+import com.example.paintracker.interfaces.IBitmapLoaderService
 import com.example.paintracker.interfaces.IPathService
 import com.example.paintracker.interfaces.IVisualiserLayerIoService
 import com.example.paintracker.interfaces.Path
@@ -19,15 +20,18 @@ import kotlin.io.path.exists
 import mu.KotlinLogging
 
 class VisualiserLayerIoService @Inject constructor(
-    private val pathService: IPathService
+    private val pathService: IPathService,
+    private val bitmapLoaderService: IBitmapLoaderService
 ) : IVisualiserLayerIoService {
 
     private val logger = KotlinLogging.logger {}
     private val dataRoot: String by lazy { pathService.getPath(Path.APPDATAROOT) }
 
-    override fun loadAll(localDate: LocalDate, layers: MutableList<VisualiserLayer>) {
+    override fun loadAll(localDate: LocalDate, layers: MutableList<VisualiserLayer>, width: Int, height: Int) {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val datePart = localDate.format(formatter)
+        logger.info("Loading all images for '${datePart}', width = ${width}, height = ${height}.")
+
         val datePath = Paths.get(dataRoot).resolve(datePart)
         for (visualLayer in layers) {
             val layerPath = datePath.resolve(visualLayer.painCategory?.id)

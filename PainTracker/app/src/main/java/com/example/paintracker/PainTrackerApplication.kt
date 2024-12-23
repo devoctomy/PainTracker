@@ -1,7 +1,7 @@
 package com.example.paintracker
 
 import android.app.Application
-import android.os.StrictMode
+//import android.os.StrictMode
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
@@ -10,7 +10,7 @@ class PainTrackerApplication : Application() {
         super.onCreate()
 
         // Initialize global resources or configurations here
-        StrictMode.setVmPolicy(
+        /*StrictMode.setVmPolicy(
             StrictMode.VmPolicy.Builder()
                 .detectAll()
                 .penaltyLog()
@@ -21,7 +21,7 @@ class PainTrackerApplication : Application() {
                 .detectAll()
                 .penaltyLog()
                 .build()
-        )
+        )*/
 
     }
 }

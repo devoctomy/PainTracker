@@ -37,7 +37,7 @@ class PainVisualiser @JvmOverloads constructor(
         set(value) {
             field = value
 
-            visualiserLayerIoService.loadAll(value, visualLayers)
+            visualiserLayerIoService.loadAll(value, visualLayers, signaturePad.width, signaturePad.height)
             frontDrawing = selectedVisualiserLayer?.frontDrawing
             backDrawing = selectedVisualiserLayer?.backDrawing
             isDirty = false
@@ -60,7 +60,7 @@ class PainVisualiser @JvmOverloads constructor(
                 updateCategoryButtonColor()
                 updateDrawingColor()
 
-                visualiserLayerIoService.loadAll(selectedDate, visualLayers)
+                visualiserLayerIoService.loadAll(selectedDate, visualLayers, signaturePad.width, signaturePad.height)
                 frontDrawing = selectedVisualiserLayer?.frontDrawing
                 backDrawing = selectedVisualiserLayer?.backDrawing
                 isDirty = false
@@ -178,10 +178,7 @@ class PainVisualiser @JvmOverloads constructor(
 
     private fun mergeAllLayers(): Bitmap {
         logger.info ("Merging all layers.")
-        val width = signaturePad.width
-        val height = signaturePad.height
-
-        val resultBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val resultBitmap = Bitmap.createBitmap(signaturePad.width, signaturePad.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(resultBitmap)
 
         for (visualLayer in visualLayers) {
