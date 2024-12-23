@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.CheckBox
@@ -20,7 +21,6 @@ import com.example.paintracker.interfaces.Side
 import com.github.gcacace.signaturepad.views.SignaturePad
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.EntryPointAccessors
-import mu.KotlinLogging
 import java.time.LocalDate
 
 class PainVisualiser @JvmOverloads constructor(
@@ -29,7 +29,6 @@ class PainVisualiser @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    private val logger = KotlinLogging.logger {}
     private val configService: IConfigService
     private val visualiserLayerIoService: IVisualiserLayerIoService
 
@@ -49,7 +48,7 @@ class PainVisualiser @JvmOverloads constructor(
         set(value) {
             field = value
             if (value.isNotEmpty()) {
-                logger.info ("Pain categories have changed, updating visual layers.")
+                Log.i("VisualiserLayerIoService","Pain categories have changed, updating visual layers.")
                 visualLayers.clear()
                 value.forEach { category ->
                     visualLayers.add(VisualiserLayer(category, null, null))
@@ -94,7 +93,7 @@ class PainVisualiser @JvmOverloads constructor(
     private var visualLayers: MutableList<VisualiserLayer> = mutableListOf()
 
     init {
-        logger.info ("Initializing PainVisualizer...")
+        Log.i("VisualiserLayerIoService","Initializing PainVisualizer...")
 
         val entryPoint = EntryPointAccessors.fromApplication(
             context.applicationContext,
@@ -169,7 +168,7 @@ class PainVisualiser @JvmOverloads constructor(
         })
 
         painCategories = configService.getCurrent().painCategories
-        logger.info ("PainVisualizer initialized.")
+        Log.i("VisualiserLayerIoService","PainVisualizer initialized.")
     }
 
     private fun reflectIsDirty() {
@@ -177,7 +176,7 @@ class PainVisualiser @JvmOverloads constructor(
     }
 
     private fun mergeAllLayers(): Bitmap {
-        logger.info ("Merging all layers.")
+        Log.i("VisualiserLayerIoService","Merging all layers.")
         val resultBitmap = Bitmap.createBitmap(signaturePad.width, signaturePad.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(resultBitmap)
 
@@ -191,7 +190,7 @@ class PainVisualiser @JvmOverloads constructor(
 
     private fun checkAndSaveIfDirty(onCompleted: () -> Unit) {
         if (isDirty) {
-            logger.info ("Changes have not been saved, prompting to save.")
+            Log.i("VisualiserLayerIoService","Changes have not been saved, prompting to save.")
             AlertDialog.Builder(context)
                 .setTitle("Unsaved changes")
                 .setMessage("Do you want to save your changes?")
@@ -212,7 +211,7 @@ class PainVisualiser @JvmOverloads constructor(
     }
 
     private fun updateSelectedVisualLayer() {
-        logger.info ("Updating selected visual layer.")
+        Log.i("VisualiserLayerIoService","Updating selected visual layer.")
         val curSelectedVisualiserLayer = visualLayers.find { it.painCategory == selectedCategory }
         if(curSelectedVisualiserLayer != null)
         {
@@ -223,7 +222,7 @@ class PainVisualiser @JvmOverloads constructor(
     }
 
     private fun saveCurrentDrawing() {
-        logger.info ("Saving current visual layer.")
+        Log.i("VisualiserLayerIoService","Saving current visual layer.")
         val bitmap = Bitmap.createBitmap(
             signaturePad.width,
             signaturePad.height,
@@ -245,7 +244,7 @@ class PainVisualiser @JvmOverloads constructor(
     }
 
     private fun switchDrawing() {
-        logger.info ("Switching to ${if (isFront) "front" else "back"}.")
+        Log.i("VisualiserLayerIoService","Switching to ${if (isFront) "front" else "back"}.")
         var drawingToShow = if (isFront) frontDrawing else backDrawing
         drawingToShow = if (showAllLayers) mergeAllLayers() else drawingToShow
 
@@ -257,21 +256,21 @@ class PainVisualiser @JvmOverloads constructor(
     }
 
     private fun updateCategoryButtonColor() {
-        logger.info ("Updating category button colour.")
+        Log.i("VisualiserLayerIoService","Updating category button colour.")
         selectedCategory?.let {
             categoryButton.backgroundTintList = ColorStateList.valueOf(it.colour)
         }
     }
 
     private fun updateDrawingColor() {
-        logger.info ("Updating drawing colour.")
+        Log.i("VisualiserLayerIoService","Updating drawing colour.")
         selectedCategory?.let {
             signaturePad.setPenColor(it.colour)
         }
     }
 
     private fun showCategoryDropdown() {
-        logger.info ("Showing pain category dropdown.")
+        Log.i("VisualiserLayerIoService","Showing pain category dropdown.")
         val popupMenu = PopupMenu(context, categoryButton)
         painCategories.forEachIndexed { index, category ->
             val menuItem = popupMenu.menu.add(0, index, index, category.displayName)
@@ -280,7 +279,7 @@ class PainVisualiser @JvmOverloads constructor(
         }
 
         popupMenu.setOnMenuItemClickListener { menuItem ->
-            logger.info ("Selected pain category.")
+            Log.i("VisualiserLayerIoService","Selected pain category.")
 
             for (i in 0 until popupMenu.menu.size()) {
                 popupMenu.menu.getItem(i).isChecked = false

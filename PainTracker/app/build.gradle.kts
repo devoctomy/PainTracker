@@ -43,7 +43,6 @@ android {
 
 dependencies {
     implementation(libs.ui.tooling)
-    implementation(libs.kotlin.logging)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.kotlinx.serialization.json)
