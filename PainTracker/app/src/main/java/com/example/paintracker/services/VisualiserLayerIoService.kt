@@ -73,6 +73,27 @@ class VisualiserLayerIoService @Inject constructor(
         }
     }
 
+    override fun deleteLayer(localDate: LocalDate, layer: VisualiserLayer, side: Side) {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val datePart = localDate.format(formatter)
+        val datePath = Paths.get(dataRoot).resolve(datePart)
+        val layerPath = datePath.resolve(layer.painCategory?.id)
+        val frontPath = layerPath.resolve("front.png")
+        val backPath = layerPath.resolve("back.png")
+        val path = if (side == Side.FRONT) frontPath else backPath
+        Log.i("VisualiserLayerIoService","Creating directory '${path.parent}'")
+        Files.createDirectories(path.parent)
+
+        if(side == Side.FRONT) {
+            Files.deleteIfExists(frontPath)
+            layer.frontDrawing = null
+        }
+        else {
+            Files.deleteIfExists(backPath)
+            layer.backDrawing = null
+        }
+    }
+
     private fun saveBitmapToFile(bitmap: Bitmap, path: String) {
         val file = File(path)
         try {

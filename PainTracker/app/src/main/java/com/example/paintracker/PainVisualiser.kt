@@ -75,6 +75,7 @@ class PainVisualiser @JvmOverloads constructor(
     private var backButton: Button
     private var categoryButton: FloatingActionButton
     private var saveButton: FloatingActionButton
+    private var deleteButton: FloatingActionButton
     private var showAllButton: CheckBox
     private var isFront = true
     private var showAllLayers = false
@@ -113,6 +114,7 @@ class PainVisualiser @JvmOverloads constructor(
         categoryButton = findViewById(R.id.categoryButton)
         showAllButton = findViewById(R.id.showAllButton)
         saveButton = findViewById(R.id.saveButton)
+        deleteButton = findViewById(R.id.deleteButton)
 
         // Set initial image
         imageView.setImageResource(frontImageRes)
@@ -148,6 +150,17 @@ class PainVisualiser @JvmOverloads constructor(
             saveCurrentDrawing()
             isDirty = false
             reflectIsDirty()
+        }
+
+        deleteButton.setOnClickListener {
+            if(!showAllLayers) { // Can't delete all layers yet
+                visualiserLayerIoService.deleteLayer(selectedDate, selectedVisualiserLayer!!, if(isFront) Side.FRONT else Side.BACK)
+                frontDrawing = selectedVisualiserLayer?.frontDrawing
+                backDrawing = selectedVisualiserLayer?.backDrawing
+                isDirty = false
+                reflectIsDirty()
+                switchDrawing()
+            }
         }
 
         signaturePad.setOnSignedListener(object : SignaturePad.OnSignedListener {
