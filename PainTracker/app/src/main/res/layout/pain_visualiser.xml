@@ -15,7 +15,7 @@
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:contentDescription="@string/painVisualiserBodyImageDescription"
+            android:contentDescription="@string/PainVisualiserBodyImageDescription"
             android:scaleType="centerInside" />
 
         <com.github.gcacace.signaturepad.views.SignaturePad
@@ -30,7 +30,7 @@
             android:layout_width="100dp"
             android:layout_height="50dp"
             android:layout_gravity="top|start"
-            android:text="@string/painVisualiserShowAllButton"
+            android:text="@string/PainVisualiserShowAllButton"
             android:padding="0dp"
             android:layout_marginStart="@dimen/fab_margin" />
 
@@ -84,7 +84,7 @@
             android:maxWidth="320dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="@string/painVisualiserFrontButton" />
+            android:text="@string/PainVisualiserFrontButton" />
 
         <Button
             android:id="@+id/buttonBack"
@@ -93,6 +93,6 @@
             android:maxWidth="320dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="@string/painVisualiserBackButton" />
+            android:text="@string/PainVisualiserBackButton" />
     </LinearLayout>
 </LinearLayout>

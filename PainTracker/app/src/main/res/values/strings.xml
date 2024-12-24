@@ -3,13 +3,15 @@
     <string name="action_settings">Settings</string>
 
     <!-- PainVisualiser -->
-    <string name="recordPainFragmentLabel">Record Pain</string>
-    <string name="painVisualiserFrontButton">Front</string>
-    <string name="painVisualiserBackButton">Back</string>
-    <string name="painVisualiserBodyImageDescription">Diagram of human body.</string>
-    <string name="painVisualiserShowAllButton">Show All</string>
+    <string name="RecordPainFragmentLabel">Record Pain</string>
+    <string name="RecordNotesFragmentLabel">Record Notes</string>
+    <string name="PainVisualiserFrontButton">Front</string>
+    <string name="PainVisualiserBackButton">Back</string>
+    <string name="PainVisualiserBodyImageDescription">Diagram of human body.</string>
+    <string name="PainVisualiserShowAllButton">Show All</string>
     <string name="PainVisualiserSelectCategoryButton">Select category</string>
     <string name="MainMenuSelectDate">Select Date</string>
     <string name="PainVisualiserSaveButton">Save</string>
     <string name="PainVisualiserClearButton">Clear</string>
+    <string name="RecordNotesFragmentTextHint">Enter your pain notes here</string>
 </resources>

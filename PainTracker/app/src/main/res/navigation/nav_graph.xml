@@ -3,12 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/RecordPainFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
+        android:id="@+id/RecordPainFragment"
         android:name="com.example.paintracker.RecordPainFragment"
-        android:label="@string/recordPainFragmentLabel"
+        android:label="@string/RecordPainFragmentLabel"
         tools:layout="@layout/fragment_record_pain">
+    </fragment>
+
+    <fragment
+        android:id="@+id/RecordNotesFragment"
+        android:name="com.example.paintracker.RecordNotesFragment"
+        android:label="@string/RecordNotesFragmentLabel"
+        tools:layout="@layout/fragment_record_notes">
     </fragment>
 </navigation>
