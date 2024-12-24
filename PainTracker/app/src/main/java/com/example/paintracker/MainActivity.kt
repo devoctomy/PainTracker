@@ -1,6 +1,5 @@
 package com.example.paintracker
 
-import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -57,12 +56,6 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
-    }
-
-    @SuppressLint("MissingSuperCall")
-    override fun onSaveInstanceState(outState: Bundle) {
-        //super.onSaveInstanceState(outState)
-        //This is temporary just to prevent some weird crash for bundling bitmaps which I totally don't understand
     }
 
     private fun showDatePickerDialog() {

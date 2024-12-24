@@ -19,6 +19,7 @@
             android:scaleType="centerInside" />
 
         <com.github.gcacace.signaturepad.views.SignaturePad
+            android:saveEnabled="false"
             android:id="@+id/signaturePad"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
