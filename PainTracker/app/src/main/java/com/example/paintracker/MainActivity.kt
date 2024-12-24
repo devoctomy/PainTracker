@@ -14,12 +14,15 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.paintracker.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private var selectedDate: LocalDate = LocalDate.now()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,27 +69,27 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as? NavHostFragment
         val currentFragment = navHostFragment?.childFragmentManager?.primaryNavigationFragment
         var painVisualiser: PainVisualiser? = null
+        var recordNotesFragment: RecordNotesFragment? = null
         if (currentFragment is RecordPainFragment) {
             painVisualiser = currentFragment.painVisualiser
         }
-
-        if(painVisualiser == null) {
-            Toast.makeText(this, "Pain visualiser not found", Toast.LENGTH_SHORT).show()
-            return
+        else if(currentFragment is RecordNotesFragment) {
+            recordNotesFragment = currentFragment
         }
 
-        val year = painVisualiser.selectedDate.year //calendar.get(Calendar.YEAR)
-        val month = painVisualiser.selectedDate.monthValue - 1 //calendar.get(Calendar.MONTH)
-        val day = painVisualiser.selectedDate.dayOfMonth //calendar.get(Calendar.DAY_OF_MONTH)
+        val year = selectedDate.year
+        val month = selectedDate.monthValue - 1
+        val day = selectedDate.dayOfMonth
 
         val datePickerDialog = DatePickerDialog(
             this,
             { _, selectedYear, selectedMonth, selectedDay ->
-                // Handle the selected date
-                val selectedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
-                Toast.makeText(this, "Selected Date: $selectedDate", Toast.LENGTH_SHORT).show()
+                val curSelectedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                Toast.makeText(this, "Selected Date: $curSelectedDate", Toast.LENGTH_SHORT).show()
 
-                painVisualiser.selectedDate = LocalDate.of(selectedYear, selectedMonth + 1, selectedDay)
+                selectedDate = LocalDate.of(selectedYear, selectedMonth + 1, selectedDay)
+                painVisualiser?.selectedDate = selectedDate
+                recordNotesFragment?.selectedDate = selectedDate
             },
             year,
             month,
