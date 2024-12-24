@@ -42,6 +42,8 @@
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/fab_margin"
+            android:layout_marginBottom="@dimen/fab_margin"
             android:contentDescription="@string/PainVisualiserBodyImageDescription"
             android:scaleType="centerInside" />
 
@@ -50,6 +52,8 @@
             android:id="@+id/signaturePad"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/fab_margin"
+            android:layout_marginBottom="@dimen/fab_margin"
             android:background="@android:color/transparent" />
 
         <CheckBox
