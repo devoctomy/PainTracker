@@ -31,6 +31,8 @@ class PainVisualiser @JvmOverloads constructor(
 
     private val configService: IConfigService
     private val visualiserLayerIoService: IVisualiserLayerIoService
+    private val frontImageRes = R.drawable.body_front
+    private val backImageRes = R.drawable.body_back
 
     var selectedDate: LocalDate = LocalDate.now()
         set(value) {
@@ -73,6 +75,7 @@ class PainVisualiser @JvmOverloads constructor(
             }
         }
 
+
     private var signaturePad: SignaturePad
     private var imageView: ImageView
     private var frontButton: Button
@@ -86,15 +89,8 @@ class PainVisualiser @JvmOverloads constructor(
     private var isDirty = false
     private var selectedCategory: PainCategory? = null
     private var selectedVisualiserLayer: VisualiserLayer? = null
-
-    // Images for front and back
-    private val frontImageRes = R.drawable.body_front
-    private val backImageRes = R.drawable.body_back
-
-    // Storage for drawing data
     private var frontDrawing: Bitmap? = null
     private var backDrawing: Bitmap? = null
-
     private var visualLayers: MutableList<VisualiserLayer> = mutableListOf()
 
     init {
@@ -107,10 +103,8 @@ class PainVisualiser @JvmOverloads constructor(
         configService = entryPoint.getConfigService()
         visualiserLayerIoService = entryPoint.getVisualiserLayerIoService()
 
-        // Inflate the layout
         LayoutInflater.from(context).inflate(R.layout.pain_visualiser, this, true)
 
-        // Find views
         signaturePad = findViewById(R.id.signaturePad)
         imageView = findViewById(R.id.imageView)
         frontButton = findViewById(R.id.buttonFront)
@@ -120,7 +114,6 @@ class PainVisualiser @JvmOverloads constructor(
         saveButton = findViewById(R.id.saveButton)
         deleteButton = findViewById(R.id.deleteButton)
 
-        // Set initial image
         imageView.setImageResource(frontImageRes)
 
         frontButton.setOnClickListener {

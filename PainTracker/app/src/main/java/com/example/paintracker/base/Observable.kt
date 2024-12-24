@@ -1,4 +1,4 @@
-package com.example.paintracker.services
+package com.example.paintracker.base
 
 open class Observable {
     private val listeners = mutableListOf<(String, Any?, Any?) -> Unit>()

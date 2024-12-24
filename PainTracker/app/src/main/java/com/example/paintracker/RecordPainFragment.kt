@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.paintracker.databinding.FragmentRecordPainBinding
 import com.example.paintracker.interfaces.IPainContext
-import com.example.paintracker.services.PainContext
+import com.example.paintracker.data.PainContext
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import javax.inject.Inject

@@ -8,7 +8,7 @@ import com.example.paintracker.interfaces.IPathService
 import com.example.paintracker.interfaces.IVisualiserLayerIoService
 import com.example.paintracker.services.BitmapLoaderService
 import com.example.paintracker.services.ConfigService
-import com.example.paintracker.services.PainContext
+import com.example.paintracker.data.PainContext
 import com.example.paintracker.services.PathService
 import com.example.paintracker.services.VisualiserLayerIoService
 import dagger.Module

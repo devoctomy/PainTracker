@@ -13,7 +13,7 @@ import com.example.paintracker.databinding.FragmentRecordNotesBinding
 import com.example.paintracker.interfaces.IPainContext
 import com.example.paintracker.interfaces.IPathService
 import com.example.paintracker.interfaces.Path
-import com.example.paintracker.services.PainContext
+import com.example.paintracker.data.PainContext
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File

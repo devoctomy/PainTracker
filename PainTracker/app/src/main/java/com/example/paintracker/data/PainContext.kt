@@ -1,5 +1,6 @@
-package com.example.paintracker.services
+package com.example.paintracker.data
 
+import com.example.paintracker.base.Observable
 import com.example.paintracker.interfaces.IPainContext
 import java.time.LocalDate
 import kotlin.properties.Delegates
