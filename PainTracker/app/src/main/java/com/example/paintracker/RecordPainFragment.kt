@@ -6,8 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.paintracker.databinding.FragmentRecordPainBinding
+import com.example.paintracker.interfaces.IPainContext
+import com.example.paintracker.services.PainContext
+import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class RecordPainFragment : Fragment() {
+    @Inject
+    lateinit var painContext: IPainContext
 
     var painVisualiser: PainVisualiser? = null
 
@@ -29,6 +37,19 @@ class RecordPainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         painVisualiser = _binding!!.painVisualiser
+
+        val painContext: PainContext = painContext as PainContext
+        painContext.addChangeListener { propertyName, oldValue, newValue ->
+            if(propertyName == "selectedDate") {
+                painVisualiser!!.selectedDate = newValue as LocalDate
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        painVisualiser!!.selectedDate = painContext.selectedDate
     }
 
     override fun onDestroyView() {

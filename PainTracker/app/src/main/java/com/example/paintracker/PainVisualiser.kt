@@ -34,6 +34,10 @@ class PainVisualiser @JvmOverloads constructor(
 
     var selectedDate: LocalDate = LocalDate.now()
         set(value) {
+            if(field == value) {
+                return
+            }
+
             field = value
 
             visualiserLayerIoService.loadAll(value, visualLayers, signaturePad.width, signaturePad.height)

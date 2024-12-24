@@ -10,36 +10,30 @@ import android.view.ViewGroup
 import android.widget.LinearLayout.INVISIBLE
 import android.widget.LinearLayout.VISIBLE
 import com.example.paintracker.databinding.FragmentRecordNotesBinding
+import com.example.paintracker.interfaces.IPainContext
 import com.example.paintracker.interfaces.IPathService
 import com.example.paintracker.interfaces.Path
+import com.example.paintracker.services.PainContext
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.nio.file.Paths
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class RecordNotesFragment : Fragment () {
     @Inject
+    lateinit var painContext: IPainContext
+    @Inject
     lateinit var pathService: IPathService
-
-    var selectedDate: LocalDate = LocalDate.now()
-        set(value) {
-            field = value
-
-            isDirty = false
-            reflectIsDirty()
-
-            loadNotes()
-        }
 
     private var _binding: FragmentRecordNotesBinding? = null
 
     private val binding get() = _binding!!
     private var saveButton: FloatingActionButton? = null
     private var isDirty: Boolean = false
+    private var existingNotes: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,10 +63,21 @@ class RecordNotesFragment : Fragment () {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                isDirty = true
+                isDirty = (existingNotes != s.toString())
                 reflectIsDirty()
             }
         })
+
+        val painContext: PainContext = painContext as PainContext
+        painContext.addChangeListener { propertyName, oldValue, newValue ->
+            loadNotes()
+        }
+
+        loadNotes()
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         loadNotes()
     }
@@ -87,14 +92,19 @@ class RecordNotesFragment : Fragment () {
     }
 
     private fun loadNotes() {
+        if(_binding == null) {
+            return
+        }
+
         val dataRoot = pathService.getPath(Path.APPDATAROOT)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val datePart = selectedDate.format(formatter)
+        val datePart = painContext.selectedDate.format(formatter)
         val datePath = Paths.get(dataRoot).resolve(datePart)
         val notesPath = datePath.resolve("notes.txt")
         val notes = File(notesPath.toString())
         if (notes.exists()) {
             val fileContents = notes.readText()
+            existingNotes  = fileContents
             binding.notesEditText.setText(fileContents)
         }
         else {
@@ -105,7 +115,7 @@ class RecordNotesFragment : Fragment () {
     private fun saveNotes() {
         val dataRoot = pathService.getPath(Path.APPDATAROOT)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val datePart = selectedDate.format(formatter)
+        val datePart = painContext.selectedDate.format(formatter)
         val datePath = Paths.get(dataRoot).resolve(datePart)
         val notesPath = datePath.resolve("notes.txt")
         val notesDirectory = datePath.toFile()

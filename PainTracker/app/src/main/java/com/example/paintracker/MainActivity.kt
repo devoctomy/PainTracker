@@ -10,15 +10,18 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.paintracker.databinding.ActivityMainBinding
+import com.example.paintracker.interfaces.IPainContext
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    @Inject
+    lateinit var painContext: IPainContext
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -66,17 +69,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showDatePickerDialog() {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as? NavHostFragment
-        val currentFragment = navHostFragment?.childFragmentManager?.primaryNavigationFragment
-        var painVisualiser: PainVisualiser? = null
-        var recordNotesFragment: RecordNotesFragment? = null
-        if (currentFragment is RecordPainFragment) {
-            painVisualiser = currentFragment.painVisualiser
-        }
-        else if(currentFragment is RecordNotesFragment) {
-            recordNotesFragment = currentFragment
-        }
-
         val year = selectedDate.year
         val month = selectedDate.monthValue - 1
         val day = selectedDate.dayOfMonth
@@ -88,8 +80,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Selected Date: $curSelectedDate", Toast.LENGTH_SHORT).show()
 
                 selectedDate = LocalDate.of(selectedYear, selectedMonth + 1, selectedDay)
-                painVisualiser?.selectedDate = selectedDate
-                recordNotesFragment?.selectedDate = selectedDate
+                painContext.selectedDate = selectedDate
             },
             year,
             month,
