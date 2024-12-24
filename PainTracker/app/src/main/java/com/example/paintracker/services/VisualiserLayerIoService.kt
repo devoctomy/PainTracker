@@ -44,12 +44,12 @@ class VisualiserLayerIoService @Inject constructor(
 
             if(frontPath.exists()) {
                 Log.i("VisualiserLayerIoService","Loading front image '${frontPath.parent}'")
-                visualLayer.frontDrawing = BitmapFactory.decodeFile(frontPath.toString())
+                visualLayer.frontDrawing = BitmapFactory.decodeFile(frontPath.toString()) // bitmapLoaderService.loadBitmap(frontPath.toString(), width, height)
             }
 
             if(backPath.exists()) {
                 Log.i("VisualiserLayerIoService","Loading back image '${backPath.parent}'")
-                visualLayer.backDrawing = BitmapFactory.decodeFile(backPath.toString())
+                visualLayer.backDrawing = BitmapFactory.decodeFile(backPath.toString()) // bitmapLoaderService.loadBitmap(backPath.toString(), width, height)
             }
         }
     }
@@ -91,6 +91,21 @@ class VisualiserLayerIoService @Inject constructor(
         else {
             Files.deleteIfExists(backPath)
             layer.backDrawing = null
+        }
+    }
+
+    override fun deleteLayers(localDate: LocalDate, layers: MutableList<VisualiserLayer>) {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val datePart = localDate.format(formatter)
+        val datePath = Paths.get(dataRoot).resolve(datePart)
+        for (visualLayer in layers) {
+            val layerPath = datePath.resolve(visualLayer.painCategory?.id)
+            val frontPath = layerPath.resolve("front.png")
+            val backPath = layerPath.resolve("back.png")
+            Files.deleteIfExists(frontPath)
+            Files.deleteIfExists(backPath)
+            visualLayer.frontDrawing = null
+            visualLayer.backDrawing = null
         }
     }
 

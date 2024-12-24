@@ -150,14 +150,17 @@ class PainVisualiser @JvmOverloads constructor(
         }
 
         deleteButton.setOnClickListener {
-            if(!showAllLayers) { // Can't delete all layers yet
-                visualiserLayerIoService.deleteLayer(selectedDate, selectedVisualiserLayer!!, if(isFront) Side.FRONT else Side.BACK)
-                frontDrawing = selectedVisualiserLayer?.frontDrawing
-                backDrawing = selectedVisualiserLayer?.backDrawing
-                isDirty = false
-                reflectIsDirty()
-                switchDrawing()
+            if(showAllLayers) {
+                visualiserLayerIoService.deleteLayers(selectedDate, visualLayers)
             }
+            else {
+                visualiserLayerIoService.deleteLayer(selectedDate, selectedVisualiserLayer!!, if(isFront) Side.FRONT else Side.BACK)
+            }
+            frontDrawing = selectedVisualiserLayer?.frontDrawing
+            backDrawing = selectedVisualiserLayer?.backDrawing
+            isDirty = false
+            reflectIsDirty()
+            switchDrawing()
         }
 
         signaturePad.setOnSignedListener(object : SignaturePad.OnSignedListener {
@@ -185,17 +188,21 @@ class PainVisualiser @JvmOverloads constructor(
         saveButton.visibility = if (isDirty) VISIBLE else INVISIBLE
     }
 
-    private fun mergeAllLayers(): Bitmap {
+    private fun mergeAllLayers(): Bitmap? {
         Log.i("VisualiserLayerIoService","Merging all layers.")
         val resultBitmap = Bitmap.createBitmap(signaturePad.width, signaturePad.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(resultBitmap)
+        var containsData = false
 
         for (visualLayer in visualLayers) {
             val drawing = if (isFront) visualLayer.frontDrawing else visualLayer.backDrawing
-            drawing?.let { canvas.drawBitmap(it, 0f, 0f, null) }
+            if(drawing != null) {
+                containsData = true
+                drawing.let { canvas.drawBitmap(it, 0f, 0f, null) }
+            }
         }
 
-        return resultBitmap
+        return if(containsData) resultBitmap else null
     }
 
     private fun checkAndSaveIfDirty(onCompleted: () -> Unit) {
@@ -261,7 +268,7 @@ class PainVisualiser @JvmOverloads constructor(
 
         if (drawingToShow != null) {
             signaturePad.signatureBitmap = drawingToShow
-            deleteButton.visibility = if(showAllLayers) INVISIBLE else VISIBLE
+            deleteButton.visibility = VISIBLE
         } else {
             signaturePad.clear()
             deleteButton.visibility = INVISIBLE
