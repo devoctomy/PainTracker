@@ -11,7 +11,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.paintracker.databinding.ActivityMainBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.time.LocalDate
 
 class MainActivity : AppCompatActivity() {
@@ -28,8 +30,10 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
 
         val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
+        bottomNavigationView.setupWithNavController(navController)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
