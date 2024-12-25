@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".ui.RecordNotesFragment">
 
     <EditText
@@ -23,7 +22,7 @@
         android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginTop="@dimen/fab_margin"
         android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_marginBottom="@dimen/fab_margin"/>
+        android:layout_marginBottom="@dimen/fab_margin" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/saveButton"
