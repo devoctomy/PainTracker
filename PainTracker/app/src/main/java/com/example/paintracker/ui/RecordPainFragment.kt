@@ -1,4 +1,4 @@
-package com.example.paintracker
+package com.example.paintracker.ui
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import com.example.paintracker.databinding.FragmentRecordPainBinding
 import com.example.paintracker.interfaces.IPainContext
 import com.example.paintracker.data.PainContext
+import com.example.paintracker.ui.widgets.PainVisualiser
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 import javax.inject.Inject

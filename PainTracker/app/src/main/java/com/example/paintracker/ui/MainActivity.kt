@@ -1,4 +1,4 @@
-package com.example.paintracker
+package com.example.paintracker.ui
 
 import android.app.DatePickerDialog
 import android.os.Bundle
@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.navigation.ui.setupWithNavController
+import com.example.paintracker.R
 import com.example.paintracker.databinding.ActivityMainBinding
 import com.example.paintracker.interfaces.IPainContext
 import com.google.android.material.bottomnavigation.BottomNavigationView

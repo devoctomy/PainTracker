@@ -1,4 +1,4 @@
-package com.example.paintracker
+package com.example.paintracker.ui
 
 import android.os.Bundle
 import android.text.Editable

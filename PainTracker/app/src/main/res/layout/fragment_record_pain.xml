@@ -5,9 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RecordPainFragment">
+    tools:context=".ui.RecordPainFragment">
 
-    <com.example.paintracker.PainVisualiser
+    <com.example.paintracker.ui.widgets.PainVisualiser
         android:id="@+id/painVisualiser"
         android:layout_width="0dp"
         android:layout_height="0dp"
