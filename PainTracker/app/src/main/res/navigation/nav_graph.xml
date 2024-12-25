@@ -7,14 +7,14 @@
 
     <fragment
         android:id="@+id/RecordPainFragment"
-        android:name="com.example.paintracker.RecordPainFragment"
+        android:name="com.example.paintracker.ui.RecordPainFragment"
         android:label="@string/RecordPainFragmentLabel"
         tools:layout="@layout/fragment_record_pain">
     </fragment>
 
     <fragment
         android:id="@+id/RecordNotesFragment"
-        android:name="com.example.paintracker.RecordNotesFragment"
+        android:name="com.example.paintracker.ui.RecordNotesFragment"
         android:label="@string/RecordNotesFragmentLabel"
         tools:layout="@layout/fragment_record_notes">
     </fragment>

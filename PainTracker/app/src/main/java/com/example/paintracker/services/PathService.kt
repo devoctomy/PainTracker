@@ -1,9 +1,13 @@
 package com.example.paintracker.services
 
 import android.content.Context
+import com.example.paintracker.data.VisualiserLayer
 import com.example.paintracker.interfaces.IPathService
-import com.example.paintracker.interfaces.Path
+import com.example.paintracker.interfaces.SpecialPath
+import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class PathService : IPathService {
     private lateinit var _context: Context
@@ -12,9 +16,18 @@ class PathService : IPathService {
         _context = context
     }
 
-    override fun getPath(path: Path): String {
+    override fun getPath(path: SpecialPath): String {
         return when (path) {
-            Path.APPDATAROOT -> Paths.get(_context.filesDir.absolutePath, "data").toString()
+            SpecialPath.APPDATAROOT -> Paths.get(_context.filesDir.absolutePath, "data").toString()
         }
+    }
+
+    override fun getVisualLayerPath(date: LocalDate, layer: VisualiserLayer) : Path {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val datePart = date.format(formatter)
+        val dataRoot = getPath(SpecialPath.APPDATAROOT)
+        val datePath = Paths.get(dataRoot).resolve(datePart)
+        val layerPath = datePath.resolve(layer.painCategory?.id)
+        return layerPath
     }
 }

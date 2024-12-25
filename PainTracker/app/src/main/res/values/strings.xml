@@ -14,4 +14,6 @@
     <string name="PainVisualiserSaveButton">Save</string>
     <string name="PainVisualiserClearButton">Clear</string>
     <string name="RecordNotesFragmentTextHint">Enter your pain notes here</string>
+    <string name="BottomNavMenuPain">Pain</string>
+    <string name="BottomNavMenuNotes">Notes</string>
 </resources>
