@@ -2,7 +2,7 @@ package com.example.paintracker.services
 
 import com.example.paintracker.interfaces.INotesIoService
 import com.example.paintracker.interfaces.IPathService
-import com.example.paintracker.interfaces.Path
+import com.example.paintracker.interfaces.SpecialPath
 import java.io.File
 import java.nio.file.Paths
 import java.time.LocalDate
@@ -14,7 +14,7 @@ class NotesIoService @Inject constructor(
 )  : INotesIoService {
 
     override fun loadNotes(date: LocalDate): String? {
-        val dataRoot = pathService.getPath(Path.APPDATAROOT)
+        val dataRoot = pathService.getPath(SpecialPath.APPDATAROOT)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val datePart = date.format(formatter)
         val datePath = Paths.get(dataRoot).resolve(datePart)
@@ -30,7 +30,7 @@ class NotesIoService @Inject constructor(
     }
 
     override fun saveNotes(date: LocalDate, notes: String) {
-        val dataRoot = pathService.getPath(Path.APPDATAROOT)
+        val dataRoot = pathService.getPath(SpecialPath.APPDATAROOT)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val datePart = date.format(formatter)
         val datePath = Paths.get(dataRoot).resolve(datePart)
@@ -42,5 +42,4 @@ class NotesIoService @Inject constructor(
 
         File(notesPath.toString()).writeText(notes)
     }
-
 }
