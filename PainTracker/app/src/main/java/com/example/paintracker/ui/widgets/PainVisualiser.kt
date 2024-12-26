@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.CheckBox
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
@@ -150,14 +149,6 @@ class PainVisualiser @JvmOverloads constructor(
             saveCurrentDrawing()
             isDirty = false
             reflectIsDirty()
-        }
-
-        imageView.viewTreeObserver.addOnGlobalLayoutListener {
-            val layoutParams = signaturePad.layoutParams as FrameLayout.LayoutParams
-            layoutParams.width = imageView.width
-            layoutParams.height = imageView.height
-            signaturePad.layoutParams = layoutParams
-            signaturePad.requestLayout()
         }
 
         deleteButton.setOnClickListener {

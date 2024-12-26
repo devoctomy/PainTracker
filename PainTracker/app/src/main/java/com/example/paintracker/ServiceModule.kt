@@ -9,7 +9,9 @@ import com.example.paintracker.interfaces.IVisualiserLayerIoService
 import com.example.paintracker.services.BitmapLoaderService
 import com.example.paintracker.services.ConfigService
 import com.example.paintracker.data.PainContext
+import com.example.paintracker.interfaces.IDataManagerService
 import com.example.paintracker.interfaces.INotesIoService
+import com.example.paintracker.services.DataManagerService
 import com.example.paintracker.services.NotesIoService
 import com.example.paintracker.services.PathService
 import com.example.paintracker.services.VisualiserLayerIoService
@@ -62,5 +64,11 @@ object ServiceModule {
     @Singleton
     fun provideNotesIoService(pathService: IPathService): INotesIoService {
         return NotesIoService(pathService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataManagerService(pathService: IPathService): IDataManagerService {
+        return DataManagerService(pathService)
     }
 }

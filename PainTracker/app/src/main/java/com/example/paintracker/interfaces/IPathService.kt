@@ -11,6 +11,7 @@ enum class SpecialPath {
 
 interface IPathService {
     fun initialize(context: Context)
-    fun getPath(path: SpecialPath): String
+    fun getPathAsString(path: SpecialPath): String
+    fun getPath(path: SpecialPath): Path
     fun getVisualLayerPath(date: LocalDate, layer: VisualiserLayer) : Path
 }

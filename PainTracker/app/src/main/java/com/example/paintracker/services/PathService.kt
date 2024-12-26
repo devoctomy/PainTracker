@@ -16,9 +16,13 @@ class PathService : IPathService {
         _context = context
     }
 
-    override fun getPath(path: SpecialPath): String {
+    override fun getPathAsString(path: SpecialPath): String {
+        return getPath(path).toString()
+    }
+
+    override fun getPath(path: SpecialPath): Path {
         return when (path) {
-            SpecialPath.APPDATAROOT -> Paths.get(_context.filesDir.absolutePath, "data").toString()
+            SpecialPath.APPDATAROOT -> Paths.get(_context.filesDir.absolutePath, "data")
         }
     }
 
@@ -26,7 +30,8 @@ class PathService : IPathService {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val datePart = date.format(formatter)
         val dataRoot = getPath(SpecialPath.APPDATAROOT)
-        val datePath = Paths.get(dataRoot).resolve(datePart)
+        val dataPath = dataRoot.resolve("data")
+        val datePath = dataPath.resolve(datePart)
         val layerPath = datePath.resolve(layer.painCategory?.id)
         return layerPath
     }
