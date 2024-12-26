@@ -15,8 +15,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RecordPainFragment : Fragment() {
-    @Inject
-    lateinit var painContext: IPainContext
+    @Inject lateinit var painContext: IPainContext
 
     var painVisualiser: PainVisualiser? = null
 

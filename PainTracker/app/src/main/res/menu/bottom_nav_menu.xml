@@ -8,4 +8,9 @@
         android:id="@+id/RecordNotesFragment"
         android:icon="@android:drawable/ic_menu_recent_history"
         android:title="@string/BottomNavMenuNotes" />
+
+    <item
+        android:id="@+id/ManageDataFragment"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:title="Manage" />
 </menu>
