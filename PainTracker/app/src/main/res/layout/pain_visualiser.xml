@@ -40,21 +40,23 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/fab_margin"
-            android:layout_marginBottom="@dimen/fab_margin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
             android:contentDescription="@string/PainVisualiserBodyImageDescription"
-            android:scaleType="centerInside" />
+            android:scaleType="fitCenter" />
 
         <com.github.gcacace.signaturepad.views.SignaturePad
-            android:saveEnabled="false"
             android:id="@+id/signaturePad"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/fab_margin"
-            android:layout_marginBottom="@dimen/fab_margin"
-            android:background="@android:color/transparent" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent"
+            app:layout_constraintTop_toTopOf="@id/imageView"
+            app:layout_constraintBottom_toBottomOf="@id/imageView"
+            app:layout_constraintStart_toStartOf="@id/imageView"
+            app:layout_constraintEnd_toEndOf="@id/imageView" />
 
         <CheckBox
             android:id="@+id/showAllButton"
