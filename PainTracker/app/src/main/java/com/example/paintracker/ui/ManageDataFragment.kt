@@ -6,12 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.paintracker.databinding.FragmentManageDataBinding
+import com.example.paintracker.interfaces.IConfigService
 import com.example.paintracker.interfaces.IDataManagerService
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class ManageDataFragment : Fragment() {
+    @Inject lateinit var configService: IConfigService
     @Inject lateinit var dataManagerService: IDataManagerService
 
     private var _binding: FragmentManageDataBinding? = null
@@ -34,6 +36,8 @@ class ManageDataFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        //dataManagerService.listAllPainEntries(configService.getCurrent().painCategories)
     }
 
     override fun onDestroyView() {

@@ -4,6 +4,6 @@ import java.time.LocalDate
 
 data class PainEntry (
     val date: LocalDate,
-    val layers: List<VisualiserLayer>,
+    val painCategories: List<PainCategory>,
     var hasNotes: Boolean
 )

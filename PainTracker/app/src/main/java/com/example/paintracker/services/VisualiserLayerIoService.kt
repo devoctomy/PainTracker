@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlin.io.path.exists
 import android.util.Log
+import com.example.paintracker.data.PainCategory
 
 class VisualiserLayerIoService @Inject constructor(
     private val pathService: IPathService,
@@ -93,6 +94,26 @@ class VisualiserLayerIoService @Inject constructor(
             visualLayer.frontDrawing = null
             visualLayer.backDrawing = null
         }
+    }
+
+    override fun layerDataExists(localDate: LocalDate, layer: VisualiserLayer): Boolean {
+        val layerPath = pathService.getVisualLayerPath(localDate, layer)
+        val frontPath = layerPath.resolve("front.png")
+        val backPath = layerPath.resolve("back.png")
+        return frontPath.exists() || backPath.exists()
+    }
+
+    override fun painCategoryDataExists(localDate: LocalDate, painCategory: PainCategory): Boolean {
+        val layerPath = pathService.getPainCategoryPath(localDate, painCategory)
+        val frontPath = layerPath.resolve("front.png")
+        val backPath = layerPath.resolve("back.png")
+        return frontPath.exists() || backPath.exists()
+    }
+
+    override fun notesExist(localDate: LocalDate): Boolean {
+        val layerPath = pathService.getDateDataPath(localDate)
+        val notesPath = layerPath.resolve("notes.txt")
+        return notesPath.exists()
     }
 
     private fun saveBitmapToFile(bitmap: Bitmap, path: String) {

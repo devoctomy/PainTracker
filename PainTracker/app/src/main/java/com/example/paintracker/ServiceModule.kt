@@ -68,7 +68,7 @@ object ServiceModule {
 
     @Provides
     @Singleton
-    fun provideDataManagerService(pathService: IPathService): IDataManagerService {
-        return DataManagerService(pathService)
+    fun provideDataManagerService(pathService: IPathService, visualiserLayerIoService: IVisualiserLayerIoService): IDataManagerService {
+        return DataManagerService(pathService, visualiserLayerIoService)
     }
 }
