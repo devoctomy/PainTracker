@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout.INVISIBLE
 import android.widget.LinearLayout.VISIBLE
+import android.widget.TextView
 import com.example.paintracker.databinding.FragmentRecordNotesBinding
 import com.example.paintracker.interfaces.IPainContext
 import com.example.paintracker.interfaces.IPathService
@@ -16,6 +17,8 @@ import com.example.paintracker.data.PainContext
 import com.example.paintracker.interfaces.INotesIoService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -30,6 +33,7 @@ class RecordNotesFragment : Fragment () {
 
     private val binding get() = _binding!!
     private var saveButton: FloatingActionButton? = null
+    private var dateLabel: TextView? = null
     private var isDirty: Boolean = false
     private var existingNotes: String? = null
 
@@ -40,6 +44,7 @@ class RecordNotesFragment : Fragment () {
         _binding = FragmentRecordNotesBinding.inflate(inflater, container, false)
 
         saveButton = binding.saveButton
+        dateLabel = binding.notesDateLabel
 
         saveButton!!.setOnClickListener {
             saveNotes()
@@ -108,6 +113,7 @@ class RecordNotesFragment : Fragment () {
             return
         }
 
+        dateLabel!!.text = formatPainEntryDate(painContext.selectedDate)
         existingNotes = notesIoService.loadNotes(painContext.selectedDate)
         binding.notesEditText.setText(existingNotes)
     }
@@ -115,5 +121,22 @@ class RecordNotesFragment : Fragment () {
     private fun saveNotes() {
         val notesContent = binding.notesEditText.text.toString()
         notesIoService.saveNotes(painContext.selectedDate, notesContent)
+    }
+
+    private fun formatPainEntryDate(date: LocalDate): String {
+        val day = date.dayOfMonth
+        val ordinal = getOrdinal(day)
+        val monthYear = date.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
+        return "$day$ordinal $monthYear"
+    }
+
+    private fun getOrdinal(day: Int): String {
+        return when {
+            day % 100 in 11..13 -> "th" // Special case for 11th, 12th, 13th
+            day % 10 == 1 -> "st"
+            day % 10 == 2 -> "nd"
+            day % 10 == 3 -> "rd"
+            else -> "th"
+        }
     }
 }

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.paintracker.data.PainContext
@@ -98,7 +97,7 @@ class ManageDataFragment : Fragment() {
                 painEntryAdapter.selectItem(targetIndex)
             }
         } else {
-            Toast.makeText(requireContext(), "No entry found for the given date.", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(requireContext(), "No entry found for the given date.", Toast.LENGTH_SHORT).show()
         }
     }
 }

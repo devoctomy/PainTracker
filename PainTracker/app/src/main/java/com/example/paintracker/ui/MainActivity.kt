@@ -9,7 +9,6 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.navigation.ui.setupWithNavController
 import com.example.paintracker.R
 import com.example.paintracker.databinding.ActivityMainBinding
@@ -84,8 +83,8 @@ class MainActivity : AppCompatActivity() {
         val datePickerDialog = DatePickerDialog(
             this,
             { _, selectedYear, selectedMonth, selectedDay ->
-                val curSelectedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
-                Toast.makeText(this, "Selected Date: $curSelectedDate", Toast.LENGTH_SHORT).show()
+                //val curSelectedDate = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                //Toast.makeText(this, "Selected Date: $curSelectedDate", Toast.LENGTH_SHORT).show()
 
                 selectedDate = LocalDate.of(selectedYear, selectedMonth + 1, selectedDay)
                 painContext.selectedDate = selectedDate
