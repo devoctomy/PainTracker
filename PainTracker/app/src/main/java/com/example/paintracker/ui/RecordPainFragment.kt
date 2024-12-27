@@ -17,12 +17,15 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RecordPainFragment : Fragment() {
+    // Dependency Injection
     @Inject lateinit var painContext: IPainContext
 
     private var _binding: FragmentRecordPainBinding? = null
+    private val binding get() = _binding ?: throw IllegalStateException("ViewBinding is only valid between onCreateView and onDestroyView.")
+
     private var painContextChangeListener: ((String, Any?, Any?) -> Unit)? = null
 
-    private val binding get() = _binding!!
+    // Control Refs
     var painVisualiser: PainVisualiser? = null
     var dateLabel: TextView? = null
 

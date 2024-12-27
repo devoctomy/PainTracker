@@ -18,6 +18,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ManageDataFragment : Fragment() {
+    // Dependency Injection
     @Inject lateinit var configService: IConfigService
     @Inject lateinit var dataManagerService: IDataManagerService
     @Inject lateinit var painContext: IPainContext

@@ -20,13 +20,15 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    // Dependency Injection
     @Inject lateinit var painContext: IPainContext
 
     private var _binding: ActivityMainBinding? = null
+    private val binding get() = _binding ?: throw IllegalStateException("ViewBinding is only valid between onCreateView and onDestroyView.")
+
     private lateinit var appBarConfiguration: AppBarConfiguration
     private var selectedDate: LocalDate = LocalDate.now()
 
-    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

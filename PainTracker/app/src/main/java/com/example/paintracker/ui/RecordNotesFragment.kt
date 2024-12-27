@@ -23,15 +23,18 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RecordNotesFragment : Fragment () {
+    // Dependency Injection
     @Inject lateinit var painContext: IPainContext
     @Inject lateinit var pathService: IPathService
     @Inject lateinit var notesIoService: INotesIoService
 
     private var _binding: FragmentRecordNotesBinding? = null
+    private val binding get() = _binding ?: throw IllegalStateException("ViewBinding is only valid between onCreateView and onDestroyView.")
+
     private var painContextChangeListener: ((String, Any?, Any?) -> Unit)? = null
     private var notesTextWatcher: TextWatcher? = null
 
-    private val binding get() = _binding!!
+    // Control Refs
     private var saveButton: FloatingActionButton? = null
     private var dateLabel: TextView? = null
     private var isDirty: Boolean = false
