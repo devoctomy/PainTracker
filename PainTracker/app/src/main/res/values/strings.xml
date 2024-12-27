@@ -16,4 +16,6 @@
     <string name="RecordNotesFragmentTextHint">Enter your pain notes here</string>
     <string name="BottomNavMenuPain">Pain</string>
     <string name="BottomNavMenuNotes">Notes</string>
+    <string name="ListItemCirclePainCategoryMarker">Pain Category Marker</string>
+    <string name="ListItemPainEntryIcon">Pain Entry</string>
 </resources>
