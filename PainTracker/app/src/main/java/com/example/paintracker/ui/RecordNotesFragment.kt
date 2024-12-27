@@ -39,7 +39,7 @@ class RecordNotesFragment : Fragment () {
     ): View {
         _binding = FragmentRecordNotesBinding.inflate(inflater, container, false)
 
-        saveButton = _binding!!.saveButton
+        saveButton = binding.saveButton
 
         saveButton!!.setOnClickListener {
             saveNotes()
