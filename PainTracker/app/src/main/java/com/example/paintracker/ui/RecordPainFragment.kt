@@ -20,6 +20,7 @@ class RecordPainFragment : Fragment() {
     var painVisualiser: PainVisualiser? = null
 
     private var _binding: FragmentRecordPainBinding? = null
+    private var painContextChangeListener: ((String, Any?, Any?) -> Unit)? = null
 
     private val binding get() = _binding!!
 
@@ -39,11 +40,12 @@ class RecordPainFragment : Fragment() {
         painVisualiser = _binding!!.painVisualiser
 
         val painContext: PainContext = painContext as PainContext
-        painContext.addChangeListener { propertyName, oldValue, newValue ->
-            if(propertyName == "selectedDate") {
+        painContextChangeListener = { propertyName, oldValue, newValue ->
+            if (propertyName == "selectedDate") {
                 painVisualiser!!.selectedDate = newValue as LocalDate
             }
         }
+        painContext.addChangeListener(painContextChangeListener!!)
     }
 
     override fun onResume() {
@@ -54,6 +56,13 @@ class RecordPainFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+
+        val painContext: PainContext = painContext as PainContext
+        painContextChangeListener?.let { listener ->
+            painContext.removeChangeListener(listener)
+        }
+
         _binding = null
+        painContextChangeListener = null
     }
 }
