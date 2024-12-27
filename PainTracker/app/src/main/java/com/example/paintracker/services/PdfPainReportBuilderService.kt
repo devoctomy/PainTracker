@@ -18,15 +18,19 @@ class PdfPainReportBuilderService @Inject constructor(
     private var title: String = ""
     private var patientName: String = ""
 
-    fun init(reportTitle: String, reportPatientName: String) {
+    override fun init(reportTitle: String, reportPatientName: String) {
         title = reportTitle
         patientName = reportPatientName
         painEntries = dataManagerService.listAllPainEntries(configService.getCurrent().painCategories)
         Log.i("PdfPainReportBuilderService", "Initialized '${title}' report for patient '${patientName}' with ${painEntries?.size} total pain entries.")
     }
 
-    fun filter(from: LocalDate, to: LocalDate) {
+    override fun filter(from: LocalDate, to: LocalDate) {
         rangedPainEntries = painEntries?.filter { it.date >= from && it.date <= to }
         Log.i("PdfPainReportBuilderService", "Filtered out ${rangedPainEntries?.size} pain entries from ${from} to ${to}.")
+    }
+
+    override fun generatePdf() {
+        TODO("Not yet implemented")
     }
 }
