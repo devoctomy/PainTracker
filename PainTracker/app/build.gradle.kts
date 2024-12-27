@@ -39,9 +39,15 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    packaging {
+        resources {
+            excludes += "META-INF/DEPENDENCIES"
+        }
+    }
 }
 
 dependencies {
+    implementation(libs.com.tom.roush.pdfbox.android)
     implementation(libs.ui.tooling)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
