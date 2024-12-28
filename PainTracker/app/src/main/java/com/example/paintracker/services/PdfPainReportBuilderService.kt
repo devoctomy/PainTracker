@@ -25,6 +25,7 @@ import com.tom_roush.pdfbox.pdmodel.common.PDRectangle
 import com.tom_roush.pdfbox.pdmodel.font.PDType1Font
 import com.tom_roush.pdfbox.pdmodel.graphics.image.LosslessFactory
 import java.io.OutputStream
+import java.time.format.DateTimeFormatter
 import kotlin.io.path.exists
 
 class PdfPainReportBuilderService constructor(
@@ -175,20 +176,40 @@ class PdfPainReportBuilderService constructor(
                     val pageWidth = currentPainPage.mediaBox.width
                     val pageHeight = currentPainPage.mediaBox.height
 
+                    val widthThird = pageWidth / 3
+
+                    contentStream.setFont(PDType1Font.HELVETICA_BOLD, 24f)
+                    contentStream.beginText()
+                    contentStream.newLineAtOffset(64f, coverPage.mediaBox.height - 64f)
+                    contentStream.showText(formatPainEntryDate(painEntry.date))
+                    contentStream.endText()
+
+
                     // Draw front image
                     if (frontBitmap != null) {
                         val bitmapWidth = frontBitmap.width.toFloat()
                         val bitmapHeight = frontBitmap.height.toFloat()
-                        val scale = minOf(pageWidth / bitmapWidth, pageHeight / bitmapHeight)
+                        val scale = minOf(widthThird / bitmapWidth, pageHeight / bitmapHeight)
                         val scaledWidth = bitmapWidth * scale
                         val scaledHeight = bitmapHeight * scale
-                        val xPosition = (pageWidth - scaledWidth) / 2
+                        //val xPosition = (pageWidth - scaledWidth) / 2
                         val yPosition = (pageHeight - scaledHeight) / 2
                         val pdImage = LosslessFactory.createFromImage(document, frontBitmap)
-                        contentStream.drawImage(pdImage, xPosition, yPosition, scaledWidth, scaledHeight)
+                        contentStream.drawImage(pdImage, widthThird, yPosition, scaledWidth, scaledHeight)
                     }
 
                     // Draw back image
+                    if (backBitmap != null) {
+                        val bitmapWidth = backBitmap.width.toFloat()
+                        val bitmapHeight = backBitmap.height.toFloat()
+                        val scale = minOf(widthThird / bitmapWidth, pageHeight / bitmapHeight)
+                        val scaledWidth = bitmapWidth * scale
+                        val scaledHeight = bitmapHeight * scale
+                        //val xPosition = (pageWidth - scaledWidth) / 2
+                        val yPosition = (pageHeight - scaledHeight) / 2
+                        val pdImage = LosslessFactory.createFromImage(document, backBitmap)
+                        contentStream.drawImage(pdImage, widthThird * 2, yPosition, scaledWidth, scaledHeight)
+                    }
                 }
             }
 
@@ -213,5 +234,22 @@ class PdfPainReportBuilderService constructor(
         }
 
         return bitmap!!
+    }
+
+    private fun formatPainEntryDate(date: LocalDate): String {
+        val day = date.dayOfMonth
+        val ordinal = getOrdinal(day)
+        val monthYear = date.format(DateTimeFormatter.ofPattern("MMMM yyyy"))
+        return "$day$ordinal $monthYear"
+    }
+
+    private fun getOrdinal(day: Int): String {
+        return when {
+            day % 100 in 11..13 -> "th" // Special case for 11th, 12th, 13th
+            day % 10 == 1 -> "st"
+            day % 10 == 2 -> "nd"
+            day % 10 == 3 -> "rd"
+            else -> "th"
+        }
     }
 }
