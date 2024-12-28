@@ -77,6 +77,8 @@ class PdfPainReportBuilderService constructor(
             for (painEntry in rangedPainEntries!!) {
                 val frontImages = mutableListOf<Bitmap>()
                 val backImages = mutableListOf<Bitmap>()
+
+                // Load each front and back image, add to the relevant list
                 for (painCategory in painEntry.painCategories) {
                     val pathCategoryPath = pathService.getPainCategoryPath(painEntry.date, painCategory)
 
@@ -93,6 +95,7 @@ class PdfPainReportBuilderService constructor(
                     }
                 }
 
+                // Get size of front images
                 var frontSize: Pair<Int, Int>? = null
                 if (frontImages.isNotEmpty()) {
                     frontSize = frontImages[0].width to frontImages[0].height
@@ -101,6 +104,7 @@ class PdfPainReportBuilderService constructor(
                     }
                 }
 
+                // Create our front body image with pain layers
                 var frontBitmap : Bitmap? = null
                 if (frontSize != null) {
                     // Draw body background
@@ -127,6 +131,7 @@ class PdfPainReportBuilderService constructor(
                     }
                 }
 
+                // Get size of back images
                 var backSize: Pair<Int, Int>? = null
                 if (backImages.isNotEmpty()) {
                     backSize = backImages[0].width to backImages[0].height
@@ -135,6 +140,7 @@ class PdfPainReportBuilderService constructor(
                     }
                 }
 
+                // Create our back body image with pain layers
                 var backBitmap : Bitmap? = null
                 if(backSize != null)
                 {
@@ -162,27 +168,27 @@ class PdfPainReportBuilderService constructor(
                     }
                 }
 
-                // skip if we have no front image for the moment
-                if(frontBitmap == null) {
-                    continue
-                }
-
-                // just draw the front image for now
+                // Draw the pain entry page
                 val currentPainPage = PDPage(PDRectangle(PDRectangle.A4.height, PDRectangle.A4.width))
                 document.addPage(currentPainPage)
                 PDPageContentStream(document, currentPainPage).use { contentStream ->
-                    val pdImage = LosslessFactory.createFromImage(document, frontBitmap)
                     val pageWidth = currentPainPage.mediaBox.width
                     val pageHeight = currentPainPage.mediaBox.height
-                    val bitmapWidth = frontBitmap.width.toFloat()
-                    val bitmapHeight = frontBitmap.height.toFloat()
-                    val scale = minOf(pageWidth / bitmapWidth, pageHeight / bitmapHeight)
-                    val scaledWidth = bitmapWidth * scale
-                    val scaledHeight = bitmapHeight * scale
-                    val xPosition = (pageWidth - scaledWidth) / 2
-                    val yPosition = (pageHeight - scaledHeight) / 2
 
-                    contentStream.drawImage(pdImage, xPosition, yPosition, scaledWidth, scaledHeight)
+                    // Draw front image
+                    if (frontBitmap != null) {
+                        val bitmapWidth = frontBitmap.width.toFloat()
+                        val bitmapHeight = frontBitmap.height.toFloat()
+                        val scale = minOf(pageWidth / bitmapWidth, pageHeight / bitmapHeight)
+                        val scaledWidth = bitmapWidth * scale
+                        val scaledHeight = bitmapHeight * scale
+                        val xPosition = (pageWidth - scaledWidth) / 2
+                        val yPosition = (pageHeight - scaledHeight) / 2
+                        val pdImage = LosslessFactory.createFromImage(document, frontBitmap)
+                        contentStream.drawImage(pdImage, xPosition, yPosition, scaledWidth, scaledHeight)
+                    }
+
+                    // Draw back image
                 }
             }
 
