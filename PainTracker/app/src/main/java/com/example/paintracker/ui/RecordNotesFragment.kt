@@ -123,7 +123,12 @@ class RecordNotesFragment : Fragment () {
 
     private fun saveNotes() {
         val notesContent = binding.notesEditText.text.toString()
-        notesIoService.saveNotes(painContext.selectedDate, notesContent)
+        if(notesContent.length > 0) {
+            notesIoService.saveNotes(painContext.selectedDate, notesContent)
+        }
+        else {
+            notesIoService.deleteNotes(painContext.selectedDate)
+        }
     }
 
     private fun formatPainEntryDate(date: LocalDate): String {

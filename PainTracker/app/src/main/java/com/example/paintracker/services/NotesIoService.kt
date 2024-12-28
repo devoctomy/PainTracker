@@ -41,4 +41,16 @@ class NotesIoService @Inject constructor(
 
         File(notesPath.toString()).writeText(notes)
     }
+
+    override fun deleteNotes(date: LocalDate) {
+        val dataRoot = pathService.getPath(SpecialPath.APPDATAROOT)
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val datePart = date.format(formatter)
+        val datePath = dataRoot.resolve(datePart)
+        val notesPath = datePath.resolve("notes.txt")
+        val notes = File(notesPath.toString())
+        if (notes.exists()) {
+            notes.delete()
+        }
+    }
 }

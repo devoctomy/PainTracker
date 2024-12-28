@@ -106,6 +106,8 @@ class MainActivity : AppCompatActivity() {
         outputStream: OutputStream
     )
     {
+        pdfPainReportBuilderService.init(this, "Pain Report", "John Doe")
+        pdfPainReportBuilderService.filter(LocalDate.of(2024, 12, 1), LocalDate.of(2024, 12, 31))
         pdfPainReportBuilderService.generatePdf(outputStream)
     }
 

@@ -29,25 +29,36 @@ class VisualiserLayerIoService @Inject constructor(
         Log.i("VisualiserLayerIoService", "Loading all images for '${datePart}', width = ${width}, height = ${height}.")
 
         for (visualLayer in layers) {
-            val layerPath = pathService.getVisualLayerPath(localDate, visualLayer)
-            val frontPath = layerPath.resolve("front.png")
-            val backPath = layerPath.resolve("back.png")
-
             visualLayer.frontDrawing?.recycle()
-            visualLayer.frontDrawing = null
             visualLayer.backDrawing?.recycle()
-            visualLayer.backDrawing = null
 
+            visualLayer.frontDrawing = loadLayerSideImage(localDate, visualLayer, Side.FRONT, width, height) //BitmapFactory.decodeFile(frontPath.toString()) // bitmapLoaderService.loadBitmap(frontPath.toString(), width, height)
+            visualLayer.backDrawing = loadLayerSideImage(localDate, visualLayer, Side.BACK, width, height) // bitmapLoaderService.loadBitmap(backPath.toString(), width, height)
+        }
+    }
+
+    override fun loadLayerSideImage(localDate: LocalDate, layer: VisualiserLayer, side: Side, width: Int, height: Int) : Bitmap? {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val datePart = localDate.format(formatter)
+        Log.i("VisualiserLayerIoService", "Loading layer $side image for '${datePart}', width = ${width}, height = ${height}.")
+
+        val layerPath = pathService.getVisualLayerPath(localDate, layer)
+        if(side == Side.FRONT) {
+            val frontPath = layerPath.resolve("front.png")
             if(frontPath.exists()) {
                 Log.i("VisualiserLayerIoService","Loading front image '${frontPath.parent}'")
-                visualLayer.frontDrawing = BitmapFactory.decodeFile(frontPath.toString()) // bitmapLoaderService.loadBitmap(frontPath.toString(), width, height)
-            }
-
-            if(backPath.exists()) {
-                Log.i("VisualiserLayerIoService","Loading back image '${backPath.parent}'")
-                visualLayer.backDrawing = BitmapFactory.decodeFile(backPath.toString()) // bitmapLoaderService.loadBitmap(backPath.toString(), width, height)
+                return BitmapFactory.decodeFile(frontPath.toString()) // bitmapLoaderService.loadBitmap(frontPath.toString(), width, height)
             }
         }
+        else {
+            val backPath = layerPath.resolve("back.png")
+            if(backPath.exists()) {
+                Log.i("VisualiserLayerIoService","Loading back image '${backPath.parent}'")
+                return BitmapFactory.decodeFile(backPath.toString()) // bitmapLoaderService.loadBitmap(backPath.toString(), width, height)
+            }
+        }
+
+        return null
     }
 
     override fun saveLayer(localDate: LocalDate, layer: VisualiserLayer, side: Side) {
