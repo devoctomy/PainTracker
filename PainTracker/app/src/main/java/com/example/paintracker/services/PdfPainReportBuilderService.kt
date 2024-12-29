@@ -329,20 +329,25 @@ class PdfPainReportBuilderService constructor(
         val squareSize = 12f // Size of the colored square
         val padding = 8f // Padding between the square and the text
         val horizontalSpacing = 20f // Space between each category entry
-        var currentX = 64f // Starting position (left margin)
+        val rightMargin = 64f // Right margin
         val y = bottomMargin + squareSize + 10f // Position slightly above the bottom margin
 
         contentStream.setFont(font, fontSize)
 
+        // Calculate the total width of the key
+        var totalWidth = 0f
+        for (category in categories) {
+            val displayNameWidth = font.getStringWidth(category.displayName) / 1000 * fontSize
+            totalWidth += squareSize + padding + displayNameWidth + horizontalSpacing
+        }
+        totalWidth -= horizontalSpacing // Remove the trailing spacing
+
+        // Starting X position to right-align the key
+        var currentX = pageWidth - rightMargin - totalWidth
+
         for (category in categories) {
             val displayNameWidth = font.getStringWidth(category.displayName) / 1000 * fontSize
             val entryWidth = squareSize + padding + displayNameWidth
-
-            // Check if the next entry fits on the same line, or move to the next line
-            if (currentX + entryWidth > pageWidth - 64f) {
-                currentX = 64f
-                contentStream.newLineAtOffset(0f, -(squareSize + 10f))
-            }
 
             // Save the graphics state
             contentStream.saveGraphicsState()
