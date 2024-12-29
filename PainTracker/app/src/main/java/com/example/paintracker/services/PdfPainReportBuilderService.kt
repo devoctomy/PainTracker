@@ -17,6 +17,7 @@ import java.time.LocalDate
 import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
 import com.example.paintracker.R
+import com.example.paintracker.data.PainCategory
 import com.example.paintracker.interfaces.INotesIoService
 import com.example.paintracker.interfaces.IPathService
 import com.tom_roush.pdfbox.pdmodel.PDDocument
@@ -25,10 +26,11 @@ import com.tom_roush.pdfbox.pdmodel.PDPageContentStream
 import com.tom_roush.pdfbox.pdmodel.common.PDRectangle
 import com.tom_roush.pdfbox.pdmodel.font.PDFont
 import com.tom_roush.pdfbox.pdmodel.font.PDType1Font
+import com.tom_roush.pdfbox.pdmodel.graphics.color.PDColor
+import com.tom_roush.pdfbox.pdmodel.graphics.color.PDDeviceRGB
 import com.tom_roush.pdfbox.pdmodel.graphics.image.LosslessFactory
 import java.io.OutputStream
 import java.time.format.DateTimeFormatter
-import java.util.StringTokenizer
 import kotlin.io.path.exists
 
 class PdfPainReportBuilderService constructor(
@@ -192,7 +194,7 @@ class PdfPainReportBuilderService constructor(
                     if(painEntry.hasNotes)
                     {
                         val notes = notesIoService.loadNotes(painEntry.date)
-                        drawTextWrapped(
+                        drawTextWrappedWithTruncation(
                             contentStream = contentStream,
                             text = notes!!,
                             x = 64f,
@@ -200,7 +202,7 @@ class PdfPainReportBuilderService constructor(
                             width = widthThird - 64f,
                             font = PDType1Font.HELVETICA,
                             fontSize = 12f,
-                            lineSpacing = 14f
+                            maxHeight = pageHeight - 150f - 64f
                         )
                     }
 
@@ -227,39 +229,148 @@ class PdfPainReportBuilderService constructor(
                         val pdImage = LosslessFactory.createFromImage(document, backBitmap)
                         contentStream.drawImage(pdImage, widthThird * 2, yPosition, scaledWidth, scaledHeight)
                     }
+
+                    drawPainCategoryKey(
+                        contentStream = contentStream,
+                        categories = painEntry.painCategories,
+                        pageWidth = pageWidth,
+                        bottomMargin = 48f,
+                        font = PDType1Font.HELVETICA,
+                        fontSize = 10f
+                    )
                }
             }
+
 
             document.save(outputStream)
         }
     }
 
-    fun drawTextWrapped(contentStream: PDPageContentStream, text: String, x: Float, y: Float, width: Float, font: PDFont, fontSize: Float, lineSpacing: Float) {
+    private fun drawTextWrappedWithTruncation(
+        contentStream: PDPageContentStream,
+        text: String,
+        x: Float,
+        y: Float,
+        width: Float,
+        font: PDFont,
+        fontSize: Float,
+        maxHeight: Float
+    ) {
         contentStream.setFont(font, fontSize)
-        contentStream.beginText()
-        contentStream.newLineAtOffset(x, y)
 
-        val tokenizer = StringTokenizer(text)
-        val line = StringBuilder()
-        var currentLineHeight = y
-        while (tokenizer.hasMoreTokens()) {
-            val token = tokenizer.nextToken()
-            val lineWithToken = if (line.isEmpty()) token else "$line $token"
-            val lineWidth = font.getStringWidth(lineWithToken) / 1000 * fontSize
-            if (lineWidth > width) {
-                contentStream.showText(line.toString())
-                contentStream.newLineAtOffset(0f, -lineSpacing)
-                currentLineHeight -= lineSpacing
-                line.clear()
-                line.append(token)
+        // Calculate the total height of the text block
+        val textHeight = calculateTextHeight(text, font, fontSize, width)
+
+        // Compare with the maximum allowed height
+        if (textHeight > maxHeight) {
+            var truncatedText = text
+            while (calculateTextHeight(truncatedText + "...", font, fontSize, width) > maxHeight) {
+                truncatedText = truncatedText.substringBeforeLast(" ")
+            }
+            truncatedText += "..."
+            drawText(contentStream, truncatedText, x, y, width, font, fontSize)
+        } else {
+            drawText(contentStream, text, x, y, width, font, fontSize)
+        }
+    }
+
+    private fun calculateTextHeight(text: String, font: PDFont, fontSize: Float, width: Float): Float {
+        val wrappedText = wrapText(text, font, fontSize, width)
+        val lineCount = wrappedText.size
+        return lineCount * fontSize * 1.2f // Assuming 1.2x line spacing
+    }
+
+    private fun wrapText(text: String, font: PDFont, fontSize: Float, width: Float): List<String> {
+        val lines = mutableListOf<String>()
+        var currentLine = ""
+        for (word in text.split(" ")) {
+            val testLine = if (currentLine.isEmpty()) word else "$currentLine $word"
+            val testWidth = font.getStringWidth(testLine) / 1000 * fontSize
+            if (testWidth > width) {
+                lines.add(currentLine)
+                currentLine = word
             } else {
-                line.append(" $token")
+                currentLine = testLine
             }
         }
-        if (line.isNotEmpty()) {
-            contentStream.showText(line.toString())
+        if (currentLine.isNotEmpty()) {
+            lines.add(currentLine)
+        }
+        return lines
+    }
+
+    private fun drawText(
+        contentStream: PDPageContentStream,
+        text: String,
+        x: Float,
+        y: Float,
+        width: Float,
+        font: PDFont,
+        fontSize: Float
+    ) {
+        contentStream.beginText()
+        contentStream.newLineAtOffset(x, y)
+        val wrappedText = wrapText(text, font, fontSize, width)
+        for (line in wrappedText) {
+            contentStream.showText(line)
+            contentStream.newLineAtOffset(0f, -fontSize * 1.2f)
         }
         contentStream.endText()
+    }
+
+    private fun drawPainCategoryKey(
+        contentStream: PDPageContentStream,
+        categories: List<PainCategory>,
+        pageWidth: Float,
+        bottomMargin: Float,
+        font: PDFont,
+        fontSize: Float
+    ) {
+        val squareSize = 12f // Size of the colored square
+        val padding = 8f // Padding between the square and the text
+        val horizontalSpacing = 20f // Space between each category entry
+        var currentX = 64f // Starting position (left margin)
+        val y = bottomMargin + squareSize + 10f // Position slightly above the bottom margin
+
+        contentStream.setFont(font, fontSize)
+
+        for (category in categories) {
+            val displayNameWidth = font.getStringWidth(category.displayName) / 1000 * fontSize
+            val entryWidth = squareSize + padding + displayNameWidth
+
+            // Check if the next entry fits on the same line, or move to the next line
+            if (currentX + entryWidth > pageWidth - 64f) {
+                currentX = 64f
+                contentStream.newLineAtOffset(0f, -(squareSize + 10f))
+            }
+
+            // Save the graphics state
+            contentStream.saveGraphicsState()
+
+            // Set the non-stroking color using PDColor
+            val colorComponents = floatArrayOf(
+                (category.colour shr 16 and 0xFF) / 255f,
+                (category.colour shr 8 and 0xFF) / 255f,
+                (category.colour and 0xFF) / 255f
+            )
+            val pdColor = PDColor(colorComponents, PDDeviceRGB.INSTANCE)
+            contentStream.setNonStrokingColor(pdColor)
+
+            // Draw the colored square
+            contentStream.addRect(currentX, y - squareSize, squareSize, squareSize)
+            contentStream.fill()
+
+            // Restore the graphics state to reset the color
+            contentStream.restoreGraphicsState()
+
+            // Draw the displayName next to the square
+            contentStream.beginText()
+            contentStream.newLineAtOffset(currentX + squareSize + padding, y - squareSize + 2f) // Slight adjustment to align with square
+            contentStream.showText(category.displayName)
+            contentStream.endText()
+
+            currentX += entryWidth + horizontalSpacing
+        }
     }
 
     private fun getBitmapFromResource(resource: Int) : Bitmap {
