@@ -2,7 +2,6 @@ package com.example.paintracker.services
 
 import com.example.paintracker.data.PainCategory
 import com.example.paintracker.data.PainEntry
-import com.example.paintracker.data.VisualiserLayer
 import com.example.paintracker.interfaces.IDataManagerService
 import com.example.paintracker.interfaces.IPathService
 import com.example.paintracker.interfaces.IVisualiserLayerIoService
@@ -33,7 +32,9 @@ class DataManagerService @Inject constructor(
                     }
                 }
                 val notesExist = visualiserLayerIoService.notesExist(date)
-                painEntries.add(PainEntry(date, curPainCategories, notesExist))
+                if(notesExist || curPainCategories.isNotEmpty()) {
+                    painEntries.add(PainEntry(date, curPainCategories, notesExist))
+                }
 
             } catch (e: DateTimeParseException) {
                 // Handle invalid directory names gracefully
