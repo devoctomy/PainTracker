@@ -282,20 +282,25 @@ class PdfPainReportBuilderService constructor(
 
     private fun wrapText(text: String, font: PDFont, fontSize: Float, width: Float): List<String> {
         val lines = mutableListOf<String>()
-        var currentLine = ""
-        for (word in text.split(" ")) {
-            val testLine = if (currentLine.isEmpty()) word else "$currentLine $word"
-            val testWidth = font.getStringWidth(testLine) / 1000 * fontSize
-            if (testWidth > width) {
+        val paragraphs = text.split("\n") // Split by newline characters
+
+        for (paragraph in paragraphs) {
+            var currentLine = ""
+            for (word in paragraph.split(" ")) {
+                val testLine = if (currentLine.isEmpty()) word else "$currentLine $word"
+                val testWidth = font.getStringWidth(testLine) / 1000 * fontSize
+                if (testWidth > width) {
+                    lines.add(currentLine)
+                    currentLine = word
+                } else {
+                    currentLine = testLine
+                }
+            }
+            if (currentLine.isNotEmpty()) {
                 lines.add(currentLine)
-                currentLine = word
-            } else {
-                currentLine = testLine
             }
         }
-        if (currentLine.isNotEmpty()) {
-            lines.add(currentLine)
-        }
+
         return lines
     }
 
