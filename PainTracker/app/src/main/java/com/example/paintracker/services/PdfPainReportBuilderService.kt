@@ -17,21 +17,25 @@ import java.time.LocalDate
 import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
 import com.example.paintracker.R
+import com.example.paintracker.interfaces.INotesIoService
 import com.example.paintracker.interfaces.IPathService
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.pdmodel.PDPage
 import com.tom_roush.pdfbox.pdmodel.PDPageContentStream
 import com.tom_roush.pdfbox.pdmodel.common.PDRectangle
+import com.tom_roush.pdfbox.pdmodel.font.PDFont
 import com.tom_roush.pdfbox.pdmodel.font.PDType1Font
 import com.tom_roush.pdfbox.pdmodel.graphics.image.LosslessFactory
 import java.io.OutputStream
 import java.time.format.DateTimeFormatter
+import java.util.StringTokenizer
 import kotlin.io.path.exists
 
 class PdfPainReportBuilderService constructor(
     private val configService: IConfigService,
     private val pathService: IPathService,
-    private val dataManagerService: IDataManagerService
+    private val dataManagerService: IDataManagerService,
+    private val notesIoService: INotesIoService
 )  : IPdfPainReportBuilderService {
 
     private var painEntries: List<PainEntry>? = null
@@ -178,12 +182,27 @@ class PdfPainReportBuilderService constructor(
 
                     val widthThird = pageWidth / 3
 
+                    // Draw the date
                     contentStream.setFont(PDType1Font.HELVETICA_BOLD, 24f)
                     contentStream.beginText()
                     contentStream.newLineAtOffset(64f, coverPage.mediaBox.height - 64f)
                     contentStream.showText(formatPainEntryDate(painEntry.date))
                     contentStream.endText()
 
+                    if(painEntry.hasNotes)
+                    {
+                        val notes = notesIoService.loadNotes(painEntry.date)
+                        drawTextWrapped(
+                            contentStream = contentStream,
+                            text = notes!!,
+                            x = 64f,
+                            y = pageHeight - 150f,
+                            width = widthThird - 64f,
+                            font = PDType1Font.HELVETICA,
+                            fontSize = 12f,
+                            lineSpacing = 14f
+                        )
+                    }
 
                     // Draw front image
                     if (frontBitmap != null) {
@@ -192,7 +211,6 @@ class PdfPainReportBuilderService constructor(
                         val scale = minOf(widthThird / bitmapWidth, pageHeight / bitmapHeight)
                         val scaledWidth = bitmapWidth * scale
                         val scaledHeight = bitmapHeight * scale
-                        //val xPosition = (pageWidth - scaledWidth) / 2
                         val yPosition = (pageHeight - scaledHeight) / 2
                         val pdImage = LosslessFactory.createFromImage(document, frontBitmap)
                         contentStream.drawImage(pdImage, widthThird, yPosition, scaledWidth, scaledHeight)
@@ -205,16 +223,43 @@ class PdfPainReportBuilderService constructor(
                         val scale = minOf(widthThird / bitmapWidth, pageHeight / bitmapHeight)
                         val scaledWidth = bitmapWidth * scale
                         val scaledHeight = bitmapHeight * scale
-                        //val xPosition = (pageWidth - scaledWidth) / 2
                         val yPosition = (pageHeight - scaledHeight) / 2
                         val pdImage = LosslessFactory.createFromImage(document, backBitmap)
                         contentStream.drawImage(pdImage, widthThird * 2, yPosition, scaledWidth, scaledHeight)
                     }
-                }
+               }
             }
 
             document.save(outputStream)
         }
+    }
+
+    fun drawTextWrapped(contentStream: PDPageContentStream, text: String, x: Float, y: Float, width: Float, font: PDFont, fontSize: Float, lineSpacing: Float) {
+        contentStream.setFont(font, fontSize)
+        contentStream.beginText()
+        contentStream.newLineAtOffset(x, y)
+
+        val tokenizer = StringTokenizer(text)
+        val line = StringBuilder()
+        var currentLineHeight = y
+        while (tokenizer.hasMoreTokens()) {
+            val token = tokenizer.nextToken()
+            val lineWithToken = if (line.isEmpty()) token else "$line $token"
+            val lineWidth = font.getStringWidth(lineWithToken) / 1000 * fontSize
+            if (lineWidth > width) {
+                contentStream.showText(line.toString())
+                contentStream.newLineAtOffset(0f, -lineSpacing)
+                currentLineHeight -= lineSpacing
+                line.clear()
+                line.append(token)
+            } else {
+                line.append(" $token")
+            }
+        }
+        if (line.isNotEmpty()) {
+            contentStream.showText(line.toString())
+        }
+        contentStream.endText()
     }
 
     private fun getBitmapFromResource(resource: Int) : Bitmap {

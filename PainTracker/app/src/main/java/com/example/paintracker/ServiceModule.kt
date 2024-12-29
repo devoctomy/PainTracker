@@ -76,7 +76,7 @@ object ServiceModule {
 
     @Provides
     @Singleton
-    fun providePdfPainReportBuilderServiceFactory(configService: IConfigService, pathService: IPathService, dataManagerService: IDataManagerService): IPdfPainReportBuilderServiceFactory {
-        return PdfPainReportBuilderServiceFactory(configService, pathService, dataManagerService)
+    fun providePdfPainReportBuilderServiceFactory(configService: IConfigService, pathService: IPathService, dataManagerService: IDataManagerService, notesIoService: INotesIoService): IPdfPainReportBuilderServiceFactory {
+        return PdfPainReportBuilderServiceFactory(configService, pathService, dataManagerService, notesIoService)
     }
 }
