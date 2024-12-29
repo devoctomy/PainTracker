@@ -9,9 +9,13 @@ import com.example.paintracker.interfaces.IVisualiserLayerIoService
 import com.example.paintracker.services.BitmapLoaderService
 import com.example.paintracker.services.ConfigService
 import com.example.paintracker.data.PainContext
+import com.example.paintracker.interfaces.IDataManagerService
 import com.example.paintracker.interfaces.INotesIoService
+import com.example.paintracker.interfaces.IPdfPainReportBuilderServiceFactory
+import com.example.paintracker.services.DataManagerService
 import com.example.paintracker.services.NotesIoService
 import com.example.paintracker.services.PathService
+import com.example.paintracker.services.PdfPainReportBuilderServiceFactory
 import com.example.paintracker.services.VisualiserLayerIoService
 import dagger.Module
 import dagger.Provides
@@ -62,5 +66,17 @@ object ServiceModule {
     @Singleton
     fun provideNotesIoService(pathService: IPathService): INotesIoService {
         return NotesIoService(pathService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataManagerService(pathService: IPathService, visualiserLayerIoService: IVisualiserLayerIoService): IDataManagerService {
+        return DataManagerService(pathService, visualiserLayerIoService)
+    }
+
+    @Provides
+    @Singleton
+    fun providePdfPainReportBuilderServiceFactory(configService: IConfigService, pathService: IPathService, dataManagerService: IDataManagerService, notesIoService: INotesIoService): IPdfPainReportBuilderServiceFactory {
+        return PdfPainReportBuilderServiceFactory(configService, pathService, dataManagerService, notesIoService)
     }
 }

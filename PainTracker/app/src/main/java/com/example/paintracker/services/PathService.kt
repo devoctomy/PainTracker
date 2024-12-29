@@ -1,6 +1,7 @@
 package com.example.paintracker.services
 
 import android.content.Context
+import com.example.paintracker.data.PainCategory
 import com.example.paintracker.data.VisualiserLayer
 import com.example.paintracker.interfaces.IPathService
 import com.example.paintracker.interfaces.SpecialPath
@@ -16,18 +17,38 @@ class PathService : IPathService {
         _context = context
     }
 
-    override fun getPath(path: SpecialPath): String {
+    override fun getPathAsString(path: SpecialPath): String {
+        return getPath(path).toString()
+    }
+
+    override fun getPath(path: SpecialPath): Path {
         return when (path) {
-            SpecialPath.APPDATAROOT -> Paths.get(_context.filesDir.absolutePath, "data").toString()
+            SpecialPath.APPDATAROOT -> Paths.get(_context.filesDir.absolutePath, "data")
         }
+    }
+
+    override fun getPainCategoryPath(date: LocalDate, painCategory: PainCategory) : Path {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val datePart = date.format(formatter)
+        val dataRoot = getPath(SpecialPath.APPDATAROOT)
+        val datePath = dataRoot.resolve(datePart)
+        val layerPath = datePath.resolve(painCategory.id)
+        return layerPath
     }
 
     override fun getVisualLayerPath(date: LocalDate, layer: VisualiserLayer) : Path {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val datePart = date.format(formatter)
         val dataRoot = getPath(SpecialPath.APPDATAROOT)
-        val datePath = Paths.get(dataRoot).resolve(datePart)
+        val datePath = dataRoot.resolve(datePart)
         val layerPath = datePath.resolve(layer.painCategory?.id)
         return layerPath
+    }
+
+    override fun getDateDataPath(date: LocalDate): Path {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val datePart = date.format(formatter)
+        val dataRoot = getPath(SpecialPath.APPDATAROOT)
+        return dataRoot.resolve(datePart)
     }
 }

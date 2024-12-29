@@ -54,6 +54,10 @@ class PainVisualiser @JvmOverloads constructor(
         }
     private var painCategories: List<PainCategory> = emptyList()
         set(value) {
+            if(field == value) {
+                return
+            }
+
             field = value
             if (value.isNotEmpty()) {
                 Log.i("VisualiserLayerIoService","Pain categories have changed, updating visual layers.")
@@ -87,7 +91,7 @@ class PainVisualiser @JvmOverloads constructor(
     private var deleteButton: FloatingActionButton
     private var showAllButton: CheckBox
     private var isFront = true
-    private var showAllLayers = false
+    private var showAllLayers = true
     private var isDirty = false
     private var selectedCategory: PainCategory? = null
     private var selectedVisualiserLayer: VisualiserLayer? = null
@@ -182,8 +186,10 @@ class PainVisualiser @JvmOverloads constructor(
             }
         })
 
-        painCategories = configService.getCurrent().painCategories
         Log.i("VisualiserLayerIoService","PainVisualizer initialized.")
+        post {
+            painCategories = configService.getCurrent().painCategories
+        }
     }
 
     private fun reflectIsDirty() {

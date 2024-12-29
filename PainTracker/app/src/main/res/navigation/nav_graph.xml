@@ -18,4 +18,11 @@
         android:label="@string/RecordNotesFragmentLabel"
         tools:layout="@layout/fragment_record_notes">
     </fragment>
+
+    <fragment
+        android:id="@+id/ManageDataFragment"
+        android:name="com.example.paintracker.ui.ManageDataFragment"
+        android:label="Manage Data"
+        tools:layout="@layout/fragment_manage_data">
+    </fragment>
 </navigation>

@@ -63,6 +63,7 @@
             android:layout_gravity="top|start"
             android:text="@string/PainVisualiserShowAllButton"
             android:padding="0dp"
+            android:checked="true"
             android:layout_marginTop="@dimen/fab_margin"
             android:layout_marginStart="@dimen/fab_margin" />
 

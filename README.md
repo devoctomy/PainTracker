@@ -42,9 +42,9 @@ Registry:
 - [x] Pain input via a number of preset categories
 - [x] Notes input
 - [x] Ability to edit previously entered data
-- [ ] Simple export to PDF functionality
+- [x] Simple export to PDF functionality
+- [x] Ability to see overview / listing of all data
 - [ ] Ability to add custom pain categories
-- [ ] Ability to see overview / listing of all data
 - [ ] Google Drive backup / storage support
 
 ## Screenshots
@@ -56,4 +56,6 @@ Registry:
 ![Back of body pain](https://github.com/devoctomy/PainTracker/raw/main/Documentation/Screenshots/Screenshot-2024-12-25-122336.png)
 
 ![Date Picker](https://github.com/devoctomy/PainTracker/raw/main/Documentation/Screenshots/Screenshot-2024-12-25-122359.png)
+
+![PDF Pain Report](https://github.com/devoctomy/PainTracker/raw/main/Documentation/Screenshots/Screenshot-2024-12-29-165151.png)
 

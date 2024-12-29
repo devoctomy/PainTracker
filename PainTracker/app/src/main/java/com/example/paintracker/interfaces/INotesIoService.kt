@@ -5,4 +5,5 @@ import java.time.LocalDate
 interface INotesIoService {
     fun loadNotes(date: LocalDate): String?
     fun saveNotes(date: LocalDate, notes: String)
+    fun deleteNotes(date: LocalDate)
 }

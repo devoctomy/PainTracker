@@ -8,6 +8,12 @@
             android:orderInCategory="100"
             android:title="@string/MainMenuSelectDate"
             app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_generate_pdf"
+            android:orderInCategory="100"
+            android:title="Generate PDF Report"
+            app:showAsAction="never" />
     </group>
 
     <group>

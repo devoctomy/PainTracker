@@ -4,7 +4,6 @@ import com.example.paintracker.interfaces.INotesIoService
 import com.example.paintracker.interfaces.IPathService
 import com.example.paintracker.interfaces.SpecialPath
 import java.io.File
-import java.nio.file.Paths
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -17,7 +16,7 @@ class NotesIoService @Inject constructor(
         val dataRoot = pathService.getPath(SpecialPath.APPDATAROOT)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val datePart = date.format(formatter)
-        val datePath = Paths.get(dataRoot).resolve(datePart)
+        val datePath = dataRoot.resolve(datePart)
         val notesPath = datePath.resolve("notes.txt")
         val notes = File(notesPath.toString())
         if (notes.exists()) {
@@ -33,7 +32,7 @@ class NotesIoService @Inject constructor(
         val dataRoot = pathService.getPath(SpecialPath.APPDATAROOT)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val datePart = date.format(formatter)
-        val datePath = Paths.get(dataRoot).resolve(datePart)
+        val datePath = dataRoot.resolve(datePart)
         val notesPath = datePath.resolve("notes.txt")
         val notesDirectory = datePath.toFile()
         if (!notesDirectory.exists()) {
@@ -41,5 +40,17 @@ class NotesIoService @Inject constructor(
         }
 
         File(notesPath.toString()).writeText(notes)
+    }
+
+    override fun deleteNotes(date: LocalDate) {
+        val dataRoot = pathService.getPath(SpecialPath.APPDATAROOT)
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val datePart = date.format(formatter)
+        val datePath = dataRoot.resolve(datePart)
+        val notesPath = datePath.resolve("notes.txt")
+        val notes = File(notesPath.toString())
+        if (notes.exists()) {
+            notes.delete()
+        }
     }
 }
