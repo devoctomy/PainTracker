@@ -4,25 +4,25 @@
       "id": "csharp",
       "displayName": "Constant Sharp",
       "description": "A constant sharp pain",
-      "colour": "red"
+      "colour": "#FFFF0000"
     },
     {
       "id": "isharp",
       "displayName": "Intermittent Sharp",
       "description": "An intermittent sharp pain",
-      "colour": "yellow"
+      "colour": "#FFFFFF00"
     },    
     {
       "id": "cdache",
       "displayName": "Constant Dull Ache",
       "description": "A constant dull ache",
-      "colour": "blue"
+      "colour": "#FF00FF00"
     },    
     {
       "id": "idache",
       "displayName": "Intermittent Dull Ache",
       "description": "An intermittent dull ache",
-      "colour": "green"
+      "colour": "#FF0000FF"
     }
   ]
 }

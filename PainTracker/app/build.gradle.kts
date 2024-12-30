@@ -60,7 +60,15 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.junit)
-    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+
+// Get rid of annoying warning for tests relating to byteBuddy being dynamically loaded by mockk
+afterEvaluate {
+    tasks.withType<Test>().configureEach {
+        // Add the JVM argument
+        jvmArgs("-XX:+EnableDynamicAgentLoading")
+    }
 }
