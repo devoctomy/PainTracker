@@ -10,9 +10,11 @@ import com.example.paintracker.services.BitmapLoaderService
 import com.example.paintracker.services.ConfigService
 import com.example.paintracker.data.PainContext
 import com.example.paintracker.interfaces.IDataManagerService
+import com.example.paintracker.interfaces.IFileSystemService
 import com.example.paintracker.interfaces.INotesIoService
 import com.example.paintracker.interfaces.IPdfPainReportBuilderServiceFactory
 import com.example.paintracker.services.DataManagerService
+import com.example.paintracker.services.FileSystemService
 import com.example.paintracker.services.NotesIoService
 import com.example.paintracker.services.PathService
 import com.example.paintracker.services.PdfPainReportBuilderServiceFactory
@@ -70,13 +72,20 @@ object ServiceModule {
 
     @Provides
     @Singleton
-    fun provideDataManagerService(pathService: IPathService, visualiserLayerIoService: IVisualiserLayerIoService): IDataManagerService {
-        return DataManagerService(pathService, visualiserLayerIoService)
+    fun provideDataManagerService(fileSystemService: IFileSystemService, pathService: IPathService, visualiserLayerIoService: IVisualiserLayerIoService): IDataManagerService {
+        return DataManagerService(fileSystemService, pathService, visualiserLayerIoService)
     }
 
     @Provides
     @Singleton
     fun providePdfPainReportBuilderServiceFactory(configService: IConfigService, pathService: IPathService, dataManagerService: IDataManagerService, notesIoService: INotesIoService): IPdfPainReportBuilderServiceFactory {
         return PdfPainReportBuilderServiceFactory(configService, pathService, dataManagerService, notesIoService)
+    }
+
+    // System
+    @Provides
+    @Singleton
+    fun provideFileSystemService(): IFileSystemService {
+        return FileSystemService()
     }
 }
