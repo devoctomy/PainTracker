@@ -51,7 +51,7 @@ class DataManagerServiceTests {
     }
 
     @Test
-    fun givenPainCategories_AndSingleValidDirNameExists_WhenListAllPainEntries_ThenPainEntriesReturned() {
+    fun givenPainCategories_AndSingleValidDirNameExists_AndAllDataExists_WhenListAllPainEntries_ThenPainEntriesReturned() {
         // Arrange
         val painCategory = PainCategory(
             "Headache",
