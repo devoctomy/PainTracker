@@ -1,5 +1,6 @@
 package com.example.paintracker.services
 
+import com.example.paintracker.data.PainCategory
 import com.example.paintracker.data.PainEntry
 import com.example.paintracker.interfaces.IFileSystemService
 import com.example.paintracker.interfaces.IPathService
@@ -10,6 +11,8 @@ import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.io.File
+import java.time.LocalDate
 
 class DataManagerServiceTests {
 
@@ -28,8 +31,8 @@ class DataManagerServiceTests {
 
     @Test
     fun givenEmptyPainCategoriesList_WhenListAllPainEntries_ThenEmptyListReturned() {
+        // Arrange
         every { pathService.getPathAsString(SpecialPath.APPDATAROOT) } returns "testPath"
-
         every {
             fileSystemService.listFiles(
                 eq("testPath"),
@@ -40,13 +43,16 @@ class DataManagerServiceTests {
             )
         } returns null
 
+        // Act
         val result = sut.listAllPainEntries(emptyList())
 
+        // Assert
         assertEquals(emptyList<PainEntry>(), result)
     }
 
-    /*@Test
-    fun listAllPainEntries_returnsPainEntries_whenValidDirectoriesExist() {
+    @Test
+    fun givenPainCategories_AndSingleValidDirNameExists_WhenListAllPainEntries_ThenPainEntriesReturned() {
+        // Arrange
         val painCategory = PainCategory(
             "Headache",
             displayName = "Display Name",
@@ -58,12 +64,21 @@ class DataManagerServiceTests {
         every { dir.name } returns "2023-01-01"
         every { dir.isDirectory } returns true
         every { pathService.getPathAsString(SpecialPath.APPDATAROOT) } returns "testPath"
-        every { File("testPath").listFiles(any<FilenameFilter>()) } returns arrayOf(dir)
+        every {
+            fileSystemService.listFiles(
+                eq("testPath"),
+                match { _ ->
+                    true
+                }
+            )
+        } returns arrayOf(dir)
         every { visualiserLayerIoService.painCategoryDataExists(date, painCategory) } returns true
         every { visualiserLayerIoService.notesExist(date) } returns true
 
-        val result = dataManagerService.listAllPainEntries(listOf(painCategory))
+        // Act
+        val result = sut.listAllPainEntries(listOf(painCategory))
 
+        // Assert
         assertEquals(1, result.size)
         assertEquals(date, result[0].date)
         assertEquals(listOf(painCategory), result[0].painCategories)
@@ -71,15 +86,25 @@ class DataManagerServiceTests {
     }
 
     @Test
-    fun listAllPainEntries_handlesInvalidDirectoryNamesGracefully() {
+    fun givenPainCategories_AndSingleInvalidDirNameExists_WhenListAllPainEntries_ThenEmptyListReturned() {
+        // Arrange
         val invalidDir = mockk<File>()
         every { invalidDir.name } returns "invalid-date"
         every { invalidDir.isDirectory } returns true
         every { pathService.getPathAsString(SpecialPath.APPDATAROOT) } returns "testPath"
-        every { File("testPath").listFiles(any<FilenameFilter>()) } returns arrayOf(invalidDir)
+        every {
+            fileSystemService.listFiles(
+                eq("testPath"),
+                match { _ ->
+                    true
+                }
+            )
+        } returns arrayOf(invalidDir)
 
-        val result = dataManagerService.listAllPainEntries(emptyList())
+        // Act
+        val result = sut.listAllPainEntries(emptyList())
 
+        // Assert
         assertEquals(emptyList<PainEntry>(), result)
-    }*/
+    }
 }
