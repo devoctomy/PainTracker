@@ -44,8 +44,10 @@ Registry:
 - [x] Ability to edit previously entered data
 - [x] Simple export to PDF functionality
 - [x] Ability to see overview / listing of all data
+- [x] Google backup / transfer support
+- [x] Export data to ZIP feature
+- [ ] Import data from ZIP feature
 - [ ] Ability to add custom pain categories
-- [ ] Google Drive backup / storage support
 
 ## Screenshots
 
