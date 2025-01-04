@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.ui.setupWithNavController
 import com.example.paintracker.R
 import com.example.paintracker.databinding.ActivityMainBinding
+import com.example.paintracker.interfaces.IConfigService
 import com.example.paintracker.interfaces.IPainContext
 import com.example.paintracker.interfaces.IPdfPainReportBuilderService
 import com.example.paintracker.interfaces.IPdfPainReportBuilderServiceFactory
@@ -27,6 +28,7 @@ import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     // Dependency Injection
+    @Inject lateinit var configService: IConfigService
     @Inject lateinit var painContext: IPainContext
     @Inject lateinit var pdfPainReportBuilderServiceFactory: IPdfPainReportBuilderServiceFactory
 
@@ -110,7 +112,7 @@ class MainActivity : AppCompatActivity() {
         outputStream: OutputStream
     )
     {
-        pdfPainReportBuilderService.init(this, "Pain Report", "John Doe")
+        pdfPainReportBuilderService.init(this, "Pain Report", configService.getCurrent().patientName)
         pdfPainReportBuilderService.filter(LocalDate.of(2024, 12, 1), LocalDate.of(2024, 12, 31))
         pdfPainReportBuilderService.generatePdf(outputStream)
     }
