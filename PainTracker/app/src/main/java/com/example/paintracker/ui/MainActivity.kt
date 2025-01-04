@@ -1,5 +1,6 @@
 package com.example.paintracker.ui
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -9,8 +10,12 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.navigation.ui.setupWithNavController
 import com.example.paintracker.R
 import com.example.paintracker.databinding.ActivityMainBinding
@@ -24,6 +29,7 @@ import java.io.OutputStream
 import java.time.LocalDate
 import javax.inject.Inject
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
+import java.util.Calendar
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -39,7 +45,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private var selectedDate: LocalDate = LocalDate.now()
-
+    private var from: LocalDate? = null
+    private var to: LocalDate? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,9 +81,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> {
                 val navController = findNavController(R.id.nav_host_fragment_content_main)
@@ -88,7 +92,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_generate_pdf -> {
-                savePdfLauncher.launch("Report.pdf")
+                showDateRangeDialog()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -113,7 +117,7 @@ class MainActivity : AppCompatActivity() {
     )
     {
         pdfPainReportBuilderService.init(this, "Pain Report", configService.getCurrent().patientName)
-        pdfPainReportBuilderService.filter(LocalDate.of(2024, 12, 1), LocalDate.of(2024, 12, 31))
+        pdfPainReportBuilderService.filter(from!!, to!!)
         pdfPainReportBuilderService.generatePdf(outputStream)
     }
 
@@ -136,5 +140,72 @@ class MainActivity : AppCompatActivity() {
             day
         )
         datePickerDialog.show()
+    }
+
+    private fun showDateRangeDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_date_range_picker, null)
+        val fromDateEditText = dialogView.findViewById<EditText>(R.id.et_from_date)
+        val toDateEditText = dialogView.findViewById<EditText>(R.id.et_to_date)
+        val changeFromDateButton = dialogView.findViewById<AppCompatImageButton>(R.id.btn_change_from_date)
+        val changeToDateButton = dialogView.findViewById<AppCompatImageButton>(R.id.btn_change_to_date)
+        val saveButton = dialogView.findViewById<Button>(R.id.btn_save)
+
+        var fromDate: LocalDate? = null
+        var toDate: LocalDate? = null
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        val updateEditText = { editText: EditText, date: LocalDate ->
+            editText.setText(date.toString())
+        }
+
+        changeFromDateButton.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            DatePickerDialog(
+                this,
+                { _, year, month, dayOfMonth ->
+                    fromDate = LocalDate.of(year, month + 1, dayOfMonth)
+                    updateEditText(fromDateEditText, fromDate!!)
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+
+        changeToDateButton.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            DatePickerDialog(
+                this,
+                { _, year, month, dayOfMonth ->
+                    toDate = LocalDate.of(year, month + 1, dayOfMonth)
+                    updateEditText(toDateEditText, toDate!!)
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+
+        saveButton.setOnClickListener {
+            if (fromDate == null || toDate == null) {
+                Toast.makeText(this, "Please select both dates", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (fromDate!! > toDate!!) {
+                Toast.makeText(this, "From date cannot be greater than To date", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            dialog.dismiss()
+            from = fromDate
+            to = toDate
+            savePdfLauncher.launch("PainReport_${fromDate}_to_${toDate}.pdf")
+        }
+
+        dialog.show()
     }
 }

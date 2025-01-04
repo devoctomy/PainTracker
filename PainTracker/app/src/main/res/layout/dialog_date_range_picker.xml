@@ -1,0 +1,97 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Generate PDF Report"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        android:gravity="center"
+        android:paddingBottom="16dp" />
+
+    <!-- From Date Input -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:hintTextAppearance="?attr/textAppearanceSubtitle1">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_from_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="From date"
+                android:focusable="false"
+                android:cursorVisible="false" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageButton
+            android:id="@+id/btn_change_from_date"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_my_calendar"
+            app:tint="?attr/colorPrimary"
+            android:contentDescription="Select From Date" />
+    </LinearLayout>
+
+    <!-- To Date Input -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:hintTextAppearance="?attr/textAppearanceSubtitle1">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_to_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="To date"
+                android:focusable="false"
+                android:cursorVisible="false" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageButton
+            android:id="@+id/btn_change_to_date"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_my_calendar"
+            app:tint="?attr/colorPrimary"
+            android:contentDescription="Select To Date" />
+    </LinearLayout>
+
+    <!-- Save Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        app:cornerRadius="24dp"
+        app:backgroundTint="?attr/colorPrimary"
+        app:strokeWidth="0dp"
+        android:textColor="?attr/colorOnPrimary"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
