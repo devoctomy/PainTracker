@@ -6,4 +6,5 @@ import com.example.paintracker.data.Config
 interface IConfigService {
     fun initialize(context: Context)
     fun getCurrent(): Config
+    fun saveCurrent(context: Context)
 }

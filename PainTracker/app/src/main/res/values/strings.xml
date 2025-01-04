@@ -18,4 +18,11 @@
     <string name="BottomNavMenuNotes">Notes</string>
     <string name="ListItemCirclePainCategoryMarker">Pain Category Marker</string>
     <string name="ListItemPainEntryIcon">Pain Entry</string>
+    <string name="patient_name_hint">Enter Patient Name</string>
+    <string name="patient_sex_label">Patient Sex</string>
+    <string name="BottomNavMenuManage">Manage</string>
+    <string-array name="patient_sex_options">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
 </resources>
