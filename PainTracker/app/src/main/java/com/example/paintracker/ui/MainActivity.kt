@@ -1,7 +1,9 @@
 package com.example.paintracker.ui
 
+import DataExporterService
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -29,7 +31,12 @@ import java.io.OutputStream
 import java.time.LocalDate
 import javax.inject.Inject
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -42,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("ViewBinding is only valid between onCreateView and onDestroyView.")
     private lateinit var savePdfLauncher: ActivityResultLauncher<String>
+    private lateinit var saveZipLauncher: ActivityResultLauncher<String>
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private var selectedDate: LocalDate = LocalDate.now()
@@ -65,6 +73,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        saveZipLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri: Uri? ->
+            if (uri != null) {
+                exportData(uri)
+            } else {
+                Toast.makeText(this, "Export canceled", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         setSupportActionBar(binding.toolbar)
 
         val navController = findNavController(R.id.nav_host_fragment_content_main)
@@ -95,6 +112,13 @@ class MainActivity : AppCompatActivity() {
                 showDateRangeDialog()
                 true
             }
+            R.id.action_export_data -> {
+                val dateFormat = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
+                val currentDate = dateFormat.format(System.currentTimeMillis())
+                val defaultFileName = "PainTracker_Export_${currentDate}.zip"
+                saveZipLauncher.launch(defaultFileName)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -109,6 +133,20 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
 
         _binding = null
+    }
+
+    private fun exportData(uri: Uri) {
+        val exporter = DataExporterService()
+        CoroutineScope(Dispatchers.IO).launch {
+            val success = exporter.exportDataToZip(uri, applicationContext)
+            runOnUiThread {
+                if (success) {
+                    Toast.makeText(this@MainActivity, "Data exported successfully!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this@MainActivity, "Failed to export data.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun generatePdf(

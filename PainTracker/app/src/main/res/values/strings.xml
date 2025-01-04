@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">PainTracker</string>
-    <string name="action_settings">Settings</string>
+    <string name="MainMenuSettings">Settings</string>
 
     <!-- PainVisualiser -->
     <string name="RecordPainFragmentLabel">Record Pain</string>
@@ -21,6 +21,8 @@
     <string name="patient_name_hint">Enter Patient Name</string>
     <string name="patient_sex_label">Patient Sex</string>
     <string name="BottomNavMenuManage">Manage</string>
+    <string name="MainMenuExportDataToZip">Export Data to ZIP</string>
+    <string name="MainMenuGeneratePdfReport">Generate PDF Report</string>
     <string-array name="patient_sex_options">
         <item>Male</item>
         <item>Female</item>
