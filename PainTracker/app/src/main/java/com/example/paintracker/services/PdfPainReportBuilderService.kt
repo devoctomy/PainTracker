@@ -18,6 +18,7 @@ import android.util.Log
 import androidx.appcompat.content.res.AppCompatResources
 import com.example.paintracker.R
 import com.example.paintracker.data.PainCategory
+import com.example.paintracker.data.Sex
 import com.example.paintracker.interfaces.INotesIoService
 import com.example.paintracker.interfaces.IPathService
 import com.tom_roush.pdfbox.pdmodel.PDDocument
@@ -78,8 +79,8 @@ class PdfPainReportBuilderService constructor(
                 contentStream.endText()
             }
 
-            val frontBody = getBitmapFromResource(R.drawable.body_front)
-            val backBody = getBitmapFromResource(R.drawable.body_back)
+            val frontBody = getBitmapFromResource(getBodyImage(true))
+            val backBody = getBitmapFromResource(getBodyImage(false))
 
             for (painEntry in rangedPainEntries!!) {
                 val frontImages = mutableListOf<Bitmap>()
@@ -243,6 +244,14 @@ class PdfPainReportBuilderService constructor(
 
 
             document.save(outputStream)
+        }
+    }
+
+    private fun getBodyImage(isFront: Boolean) : Int {
+        return if (configService.getCurrent().patientSex == Sex.Male) {
+            if(isFront) R.drawable.male_front else R.drawable.male_back
+        } else {
+            if(isFront) R.drawable.female_front else R.drawable.female_back
         }
     }
 
