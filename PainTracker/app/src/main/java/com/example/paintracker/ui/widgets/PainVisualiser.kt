@@ -16,6 +16,7 @@ import android.widget.PopupMenu
 import com.example.paintracker.HiltServiceBridge
 import com.example.paintracker.R
 import com.example.paintracker.data.PainCategory
+import com.example.paintracker.data.Sex
 import com.example.paintracker.data.VisualiserLayer
 import com.example.paintracker.interfaces.IConfigService
 import com.example.paintracker.interfaces.IVisualiserLayerIoService
@@ -33,8 +34,6 @@ class PainVisualiser @JvmOverloads constructor(
 
     private val configService: IConfigService
     private val visualiserLayerIoService: IVisualiserLayerIoService
-    private val frontImageRes = R.drawable.body_front
-    private val backImageRes = R.drawable.body_back
 
     var selectedDate: LocalDate = LocalDate.now()
         set(value) {
@@ -120,12 +119,12 @@ class PainVisualiser @JvmOverloads constructor(
         saveButton = findViewById(R.id.saveButton)
         deleteButton = findViewById(R.id.deleteButton)
 
-        imageView.setImageResource(frontImageRes)
+        imageView.setImageResource(getBodyImage())
 
         frontButton.setOnClickListener {
             checkAndSaveIfDirty {
                 isFront = true
-                imageView.setImageResource(frontImageRes)
+                imageView.setImageResource(getBodyImage())
                 switchDrawing()
             }
         }
@@ -133,7 +132,7 @@ class PainVisualiser @JvmOverloads constructor(
         backButton.setOnClickListener {
             checkAndSaveIfDirty {
                 isFront = false
-                imageView.setImageResource(backImageRes)
+                imageView.setImageResource(getBodyImage())
                 switchDrawing()
             }
         }
@@ -243,6 +242,14 @@ class PainVisualiser @JvmOverloads constructor(
             frontDrawing = curSelectedVisualiserLayer.frontDrawing
             backDrawing = curSelectedVisualiserLayer.backDrawing
             selectedVisualiserLayer = curSelectedVisualiserLayer
+        }
+    }
+
+    private fun getBodyImage() : Int {
+        return if (configService.getCurrent().patientSex == Sex.Male) {
+            if(isFront) R.drawable.male_front else R.drawable.male_back
+        } else {
+            if(isFront) R.drawable.female_front else R.drawable.female_back
         }
     }
 
