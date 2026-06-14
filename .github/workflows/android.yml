@@ -41,3 +41,12 @@ jobs:
 
     - name: Verify Lint
       run: cd PainTracker && ./gradlew lint
+
+    - name: Assemble Release APK
+      run: cd PainTracker && ./gradlew assembleRelease
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release
+        path: PainTracker/app/build/outputs/apk/release/*.apk
